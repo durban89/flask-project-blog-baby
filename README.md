@@ -24,6 +24,14 @@ flask run
 ## 第二种方式
 gunicorn -w 4 -b 127.0.0.1:4000 baby
 
+## 第三种方式
+通过wheel打包后，使用安装包进行安装
+
+## 秘钥生成及配置
+import os;os.urandom(32)
+
+在安装的实例目录下 创建 config.py 配置文件并添加如下行
+SECRET_KEY=''
 
 # 单元测试
 pip install -e .

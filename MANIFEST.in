@@ -1,4 +1,4 @@
 include baby/schema.sql
 graft baby/static
-graft babt/templates
+graft baby/templates
 global-exclude *.pyc

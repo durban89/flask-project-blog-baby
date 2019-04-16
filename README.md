@@ -1,3 +1,0 @@
-# baby
-
-baby blog

@@ -80,7 +80,7 @@ def login():
 @bp.route('/logout', methods=['GET'])
 def logout():
     session.clear()
-    return redirect(url_for('blog'))
+    return redirect(url_for('blog.index'))
 
 def login_required(view):
     @functools.wraps(view)

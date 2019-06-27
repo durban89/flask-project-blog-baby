@@ -32,7 +32,7 @@ def test_register_validate_input(client, username, password, message):
 def test_login(client, auth):
     assert client.get('/auth/login').status_code == 200
     response = auth.login()
-    assert 'http://localhost/baby' == response.headers['Location']
+    assert 'http://localhost/' == response.headers['Location']
 
     with client:
         client.get('/')

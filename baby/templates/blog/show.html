@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Posts - {{ post['title'] }}{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{url_for('blog.update', id=post['id'])}}">Edit</a>
+    <a class="action" href="{{url_for('blog.delete', id=post['id'])}}">Del</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <article class="post">
+    <p class="body">{{ post['body'] }}</p>
+  </article>
+{% endblock %}

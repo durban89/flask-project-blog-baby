@@ -56,7 +56,7 @@ stdout_logfile = /var/tmp/baby_stdout.log
 ; 可以通过 environment 来添加需要的环境变量，一种常见的用法是修改 PYTHONPATH
 ; environment=PYTHONPATH=$PYTHONPATH:/path/to/somewhere%  
 ```
-                                                                ```
+
 启动supervisor
 
 配置nginx，示例如下

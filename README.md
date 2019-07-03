@@ -1,18 +1,24 @@
 # Deploy Fefore
+```
 pip freeze > requirement.txt
+```
 
 # Run Environment
 
+```
 python3 -m venv .env3
 source .env3/bin/activate
 pip install
 pip install -r requirement.txt
+```
 
 # Development Configuration
 
+```
 export FLASK_APP=baby
 export FLASK_ENV=development
 flask run
+```
 
 # Deployment Configuration
 
@@ -44,6 +50,7 @@ stdout_logfile = /var/tmp/baby_stdout.log
 ; environment=PYTHONPATH=$PYTHONPATH:/path/to/somewhere%                                                                  ```
 启动supervisor
 配置nginx，示例如下
+
 ```
 server {
 	charset utf-8;

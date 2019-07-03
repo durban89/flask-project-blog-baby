@@ -23,14 +23,21 @@ flask run
 # Deployment Configuration
 
 ## 第一种方式
+
+```
 export FLASK_APP=baby
 export FLASK_ENV=production
 flask run
+```
 
 ## 第二种方式
-gunicorn+supervisor
+
+### gunicorn+supervisor
+
 修改gunicorn.example.conf为gunicorn.conf，修改里面的对应的日志文件路径
+
 supervisor启动配置，示例如下
+
 ```
 [program:baby]
 directory = /Users/durban/python/baby ; 程序的启动目录
@@ -47,8 +54,11 @@ stdout_logfile_backups = 20     ; stdout 日志文件备份数
 stdout_logfile = /var/tmp/baby_stdout.log
 
 ; 可以通过 environment 来添加需要的环境变量，一种常见的用法是修改 PYTHONPATH
-; environment=PYTHONPATH=$PYTHONPATH:/path/to/somewhere%                                                                  ```
+; environment=PYTHONPATH=$PYTHONPATH:/path/to/somewhere%  
+```
+                                                                ```
 启动supervisor
+
 配置nginx，示例如下
 
 ```
@@ -77,18 +87,27 @@ server {
 ```
 
 ## 第三种方式
+
 通过wheel打包后，使用安装包进行安装
 
 ## 秘钥生成及配置
+
+```
 import os;os.urandom(32)
+```
 
 在安装的实例目录下 创建 config.py 配置文件并添加如下行
+
+```
 SECRET_KEY=''
+```
 
 # 单元测试
+
+```
 pip install -e .
 pytest
 coverage run -m pytest
 coverage report
 coverage html
-
+```

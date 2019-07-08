@@ -4,6 +4,7 @@ import os
 
 from flask import Flask
 
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -36,7 +37,11 @@ def create_app(test_config=None):
     app.register_blueprint(blog.bp)
     app.add_url_rule('/', endpoint='index')
 
+    from . import api_auth
+    app.register_blueprint(api_auth.bp)
+
     return app
+
 
 application = create_app()
 

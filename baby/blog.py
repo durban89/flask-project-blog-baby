@@ -107,6 +107,6 @@ def delete(id):
 
 @bp.route('/<int:id>/show', methods=['GET'])
 def show(id):
-    post = get_post(id)
+    post = get_post(id, False)
 
     return render_template('blog/show.html', post=post)

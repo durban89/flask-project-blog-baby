@@ -133,6 +133,18 @@ in %(module)s: %(message)s ',
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import food
+    app.register_blueprint(food.bp)
+
+    from . import api_food
+    app.register_blueprint(api_food.bp)
+
+    from . import api_food_type
+    app.register_blueprint(api_food_type.bp)
+
+    from . import api_food_week
+    app.register_blueprint(api_food_week.bp)
+
     from . import blog
     app.register_blueprint(blog.bp)
     app.add_url_rule('/', endpoint='index')
@@ -140,7 +152,7 @@ in %(module)s: %(message)s ',
     from . import api_auth
     app.register_blueprint(api_auth.bp)
 
-    if app.debug:
+    if not app.debug:
         # SMTP
         register_mail_handler(app)
         # Sentry

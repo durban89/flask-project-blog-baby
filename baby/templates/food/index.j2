@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Daily Eating{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{url_for('food.create')}}">New</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<table>
+	<thead>
+		<tr>
+			<td></td>
+			{% for type in types%}
+			<td>{{ types[type]['name']}}</td>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for week in weeks %}
+		<tr>
+			<td>{{ weeks[week]['name'] }}</td>
+			{% for food in weeks[week]['food'] %}
+			<td>{{ weeks[week]['food'][food] }}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

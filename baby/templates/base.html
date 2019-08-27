@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <title>{% block title %}{% endblock %} - Baby</title>
+{% block top_link %}{% endblock %}
 <link rel="stylesheet" href="{{url_for('static', filename='app.css')}}" />
+{% block end_link %}{% endblock %}
 <nav>
   <h1>Baby</h1>
   <ul>
@@ -22,3 +24,4 @@
   {% endfor %}
   {% block content %}{% endblock %}
 </section>
+{% block script %}{% endblock %}

@@ -1,19 +1,47 @@
 {% extends 'base.html' %}
 
+{% block top_link %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/simditor/simditor.css')}}" />
+{% endblock %}
+
 {% block header %}
   <h1>{% block title %}Edit "{{ post['title'] }}"{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
   <form method="POST">
-    <label for="title">Title</label>
-    <input id="title" name="title" value="{{ request.form['title'] or post['title']}}" required />
-    <label for="body">Body</label>
-    <textarea name="body" id="body">{{ request.form['body'] or post['body'] }}</textarea>
-    <input type="submit" value="Save" />
+    <div class="input-group">
+      <label for="title" class="label-title">Title</label>
+      <input class='input-title' id="title" name="title" value="{{ request.form['title'] or post['title']}}" required />
+    </div>
+  
+    <div class="input-group">
+      <label for="date" class="label-date">Publication date</label>
+      <input class='input-date' id="date" name="date" value="{{ request.form['date'] or post['date']}}" required />
+    </div>
+
+    <div class="input-group">
+      <label for="body" class="label-body">Body</label>
+      <textarea name="body" id="body" class="textarea-body">{{ request.form['body'] or post['body'] }}</textarea>
+    </div>
+
+    <button type="submit" class="button-submit">Save</button>
   </form>
   <hr />
   <form method="POST" action="{{url_for('blog.delete', id=post['id'])}}">
-    <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');" />
+    <button class="button-submit danger" type="submit" onclick="return confirm('Are you sure?');">Delete</button>
   </form>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{url_for('static', filename='js/simditor/jquery.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/simditor/module.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/simditor/hotkeys.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/simditor/simditor.js')}}"></script>
+<script type="text/javascript">
+var editor = new Simditor({
+  textarea: $('#body')
+  //optional options
+});
+</script>
 {% endblock %}

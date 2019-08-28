@@ -44,6 +44,7 @@ CREATE TABLE food_week_list (
 CREATE TABLE food_type (
 	autokid INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(32) NOT NULL,
+    sort INTEGER NOT NULL,
     ctime INTEGER NOT NULL,
     mtime INTEGER NOT NULL,
     UNIQUE(name)

@@ -192,7 +192,7 @@ def type_update(id):
 def get_food_type():
     rows = get_db().execute(
         'SELECT autokid, name FROM food_type '
-        ' ORDER BY name ASC').fetchall()
+        ' ORDER BY sort ASC').fetchall()
 
     types = {}
 

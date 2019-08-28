@@ -17,7 +17,7 @@ bp = Blueprint('api_food_type', __name__, url_prefix='/api/food')
 @bp.route('/type/', methods=['GET'])
 def type():
     '''food type list'''
-    foodList = get_db().execute('SELECT autokid, name FROM food_type '
+    foodList = get_db().execute('SELECT autokid, name, sort FROM food_type '
                                 'ORDER BY autokid DESC').fetchall()
     # sqlite3.Row 转化为dict
     item = []
@@ -45,12 +45,15 @@ def type_create():
         return fail_json(u'此类已存在')
 
     timestamp = int(time.time())
+    sort = 0
+    if 'sort' in formData:
+        sort = int(formData['sort'])
 
     db.execute(
         'INSERT INTO '
-        'food_type (name, ctime, mtime)'
-        ' VALUES (?, ?, ?)',
-        (name, timestamp, timestamp)
+        'food_type (name, sort, ctime, mtime)'
+        ' VALUES (?, ?, ?, ?)',
+        (name, sort, timestamp, timestamp)
     )
     db.commit()
 
@@ -90,30 +93,46 @@ def type_update(id):
         return fail_json('详情数据不存在')
 
     formData = request.form
-    if 'name' not in formData:
+    if not len(formData):
         return fail_json('参数异常')
-
-    name = formData['name']
-
-    existRow = fetch_food_type_exit_one(id, name)
-    if existRow:
-        return fail_json('数据已存在')
 
     db = get_db()
 
-    db.execute(
-        'UPDATE food_type SET name=:name WHERE autokid = :id',
-        {'name': name, 'id': id}
-    )
+    if 'name' in formData:
 
-    db.commit()
+        name = formData['name']
+
+        existRow = fetch_food_type_exit_one(id, name)
+        if existRow:
+            return fail_json('数据已存在')
+
+        db.execute(
+            'UPDATE food_type SET name=:name WHERE autokid = :id',
+            {'name': name, 'id': id}
+        )
+
+        db.commit()
+
+    if 'sort' in formData:
+
+        sort = formData['sort']
+
+        db.execute(
+            'UPDATE food_type SET sort=:sort WHERE autokid = :id',
+            {'sort': sort, 'id': id}
+        )
+
+        db.commit()
 
     return success_json()
 
 
 def fetch_food_type_one_with_id(id):
-    row = get_db().execute('SELECT autokid, name, ctime, mtime FROM food_type'
-                           ' WHERE autokid = :id', {'id': id}).fetchone()
+    row = get_db().execute(
+        'SELECT * FROM food_type'
+        ' WHERE autokid = :id',
+        {'id': id}
+    ).fetchone()
 
     if not row:
         return None

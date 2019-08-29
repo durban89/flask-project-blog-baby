@@ -19,47 +19,43 @@ from baby.db import get_db
 
 bp = Blueprint('food', __name__, url_prefix='/food')
 
+WEEK = {
+    '1': {
+        'name': u'周一',
+        'food': []
+    },
+    '2': {
+        'name': u'周二',
+        'food': []
+    },
+    '3': {
+        'name': u'周三',
+        'food': []
+    },
+    '4': {
+        'name': u'周四',
+        'food': []
+    },
+    '5': {
+        'name': u'周五',
+        'food': []
+    },
+    '6': {
+        'name': u'周六',
+        'food': []
+    },
+    '7': {
+        'name': u'周日',
+        'food': []
+    },
+}
+
 
 @bp.route('/', methods=['GET'])
 def index():
     '''food list'''
     user_id = g.user['id']
-    weeks = {}
-    weeks['1'] = {
-        'name': u'周一',
-        'content': u'',
-        'food': []
-    }
-    weeks['2'] = {
-        'name': u'周二',
-        'content': u'',
-        'food': []
-    }
-    weeks['3'] = {
-        'name': u'周三',
-        'content': u'',
-        'food': []
-    }
-    weeks['4'] = {
-        'name': u'周四',
-        'content': u'',
-        'food': []
-    }
-    weeks['5'] = {
-        'name': u'周五',
-        'content': u'',
-        'food': []
-    }
-    weeks['6'] = {
-        'name': u'周六',
-        'content': u'',
-        'food': []
-    }
-    weeks['7'] = {
-        'name': u'周日',
-        'content': u'',
-        'food': []
-    }
+    weeks = WEEK
 
     types = get_food_type()
 
@@ -69,9 +65,9 @@ def index():
             if type_id not in weeks_food:
                 food = get_data_from_list_with_week(week, type_id, user_id)
                 if food:
-                    weeks_food[type_id] = food
+                    weeks_food[type_id] = food['content']
                 else:
-                    weeks_food[type_id] = '--'
+                    weeks_food[type_id] = ''
 
         weeks[week]['food'] = weeks_food
 
@@ -189,6 +185,47 @@ def type_update(id):
     return success_json()
 
 
+@bp.route('/week/<int:week>/<int:type_id>', methods=['GET', 'POST'])
+def week_update(week, type_id):
+    '''更新'''
+    user_id = g.user['id']
+
+    content = ''
+    is_new = False
+
+    week_data = get_data_with_week_type(week, type_id, user_id)
+
+    if week_data is None:
+        food_data = get_data_from_list_with_week(week, type_id, user_id)
+        if food_data:
+            content = food_data['content']
+    else:
+        is_new = True
+        content = week_data['content']
+
+    if request.method == 'POST':
+        if len(request.form) > 0 \
+                and 'content' in request.form \
+                and request.form['content']:
+            db = get_db()
+            db.execute()
+            db.commit()
+
+        redirect(url_for('food.index'))
+
+    types = get_food_type()
+
+    renderData = {}
+    renderData['content'] = content
+    renderData['is_new'] = is_new
+    renderData['week_name'] = WEEK[str(week)]['name']
+    renderData['type_name'] = types[type_id]['name']
+
+    current_app.logger.info(renderData)
+
+    return render_template('food/week_update.j2', renderData=renderData)
+
+
 def get_food_type():
     rows = get_db().execute(
         'SELECT autokid, name FROM food_type '
@@ -220,9 +257,28 @@ def get_data_from_list_with_week(week, type_id, user_id):
     if row:
         row = dict(zip(row.keys(), row))
 
-        return row['content']
+        return row
 
-    return ''
+    return None
+
+
+def get_data_with_week_type(week, type_id, user_id):
+    row = get_db().execute(
+        'SELECT * FROM food_week_list'
+        ' WHERE week = :week'
+        ' AND user_id = :user_id'
+        ' AND type_id = :type_id',
+        {
+            'week': week,
+            'type_id': type_id,
+            'user_id': user_id,
+        }
+    ).fetchone()
+
+    if row:
+        return dict(zip(row.keys(), row))
+
+    return None
 
 
 def get_data_with_week(week, user_id):

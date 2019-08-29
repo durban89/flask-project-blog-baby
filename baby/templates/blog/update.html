@@ -12,12 +12,12 @@
   <form method="POST">
     <div class="input-group">
       <label for="title" class="label-title">Title</label>
-      <input class='input-title' id="title" name="title" value="{{ request.form['title'] or post['title']}}" required />
+      <input class='input-title' id="title" name="title" value="{{ request.form['title'] or post['title'] }}" required />
     </div>
   
     <div class="input-group">
       <label for="date" class="label-date">Publication date</label>
-      <input class='input-date' id="date" name="date" value="{{ request.form['date'] or post['date']}}" required />
+      <input class='input-date' id="date" name="date" value="{{ request.form['date'] or post['date'] }}" required />
     </div>
 
     <div class="input-group">

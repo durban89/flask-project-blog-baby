@@ -4,11 +4,12 @@
   <h1>{% block title %}Daily Eating{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{url_for('food.create')}}">New</a>
+    <a class="action" href="{{url_for('food.create')}}">History</a>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-<table>
+<table class="food-table">
 	<thead>
 		<tr>
 			<td></td>
@@ -21,11 +22,55 @@
 		{% for week in weeks %}
 		<tr>
 			<td>{{ weeks[week]['name'] }}</td>
-			{% for food in weeks[week]['food'] %}
-			<td>{{ weeks[week]['food'][food] }}</td>
+			{% for type_id in weeks[week]['food'] %}
+			<td>
+				{% if weeks[week]['food'][type_id] == '' %}
+				<div class="row-container">
+					<span>--</span>
+					<div class="control-container">
+						<div class="flex-container">
+							<span class='btn create-btn' data-url='{{ url_for("food.week_update", week=week, type_id=type_id)}}' data-week='{{ week }}' data-type='{{ type_id }}'>添加</span>
+						</div>
+					</div>
+				</div>
+				{% else %}
+				<div class="row-container">
+					<span>{{ weeks[week]['food'][type_id] }}</span>
+					<div class="control-container">
+						<div class="flex-container">
+							<span class='btn update-btn' data-url='{{ url_for("food.week_update", week=week, type_id=type_id)}}' data-week='{{ week }}' data-type='{{ type_id }}'>更新</span>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+			</td>
 			{% endfor %}
 		</tr>
 		{% endfor %}
 	</tbody>
 </table>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery.slim.min.js')}}"></script>
+<script type="text/javascript">
+  $(function(){
+    $('.create-btn').click(function(){
+      var week = $(this).data('week');
+      var type_id = $(this).data('type');
+      var url = $(this).data('url');
+
+      window.location.href = url;
+    });
+
+    $('.update-btn').click(function(){
+      var week = $(this).data('week');
+      var type_id = $(this).data('type');
+
+      var url = $(this).data('url');
+
+      window.location.href = url;
+    });
+  })
+</script>
 {% endblock %}

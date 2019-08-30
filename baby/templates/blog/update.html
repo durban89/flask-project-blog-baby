@@ -17,7 +17,7 @@
   
     <div class="input-group">
       <label for="date" class="label-date">Publication date</label>
-      <input class='input-date' id="date" name="date" value="{{ request.form['date'] or post['date'] }}" required />
+      <input class='input-date' id="date" name="date" value="{{ request.form['date'] or post['the_date'] }}" autocomplete="off" required />
     </div>
 
     <div class="input-group">

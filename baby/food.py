@@ -3,7 +3,7 @@
 '''食物'''
 
 import time
-from datetime import datetime
+from datetime import datetime, date
 from flask import (
     Blueprint,
     jsonify,
@@ -71,7 +71,42 @@ def index():
 
         weeks[week]['food'] = weeks_food
 
+    current_app.logger.info(weeks)
+
     return render_template('food/index.j2', weeks=weeks, types=types)
+
+
+@bp.route('/history', methods=['GET'])
+def history():
+    user_id = g.user['id']
+
+    db = get_db()
+
+    rows = db.execute(
+        'SELECT fl.autokid,'
+        ' fl.week, fl.type_id,'
+        ' fl.content, fl.ctime,'
+        ' ft.name as type_name'
+        ' FROM food_list as fl'
+        ' LEFT JOIN food_type ft ON ft.autokid = fl.type_id'
+        ' WHERE fl.user_id=:user_id'
+        ' ORDER BY fl.autokid DESC'
+        ' LIMIT 0, 10',
+        {
+            "user_id": user_id
+        }
+    ).fetchall()
+
+    foods = []
+    if len(rows) > 0:
+        for row in rows:
+            tmp = dict(zip(row.keys(), row))
+            tmp['week_name'] = WEEK[str(tmp['week'])]['name']
+            tmp['timeStr'] = date.fromtimestamp(
+                tmp['ctime']).strftime('%Y.%m.%d')
+            foods.append(tmp)
+
+    return render_template('food/history.j2', foods=foods)
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -133,20 +168,8 @@ def create():
     return render_template('food/create.j2', types=types)
 
 
-@bp.route('/<int:id>', methods=['GET'])
-def type_detail(id):
-    '''food detail'''
-
-    row = fetch_food_one_with_id(id)
-
-    if not row:
-        return fail_json('详情数据不存在')
-
-    return success_json(dict(zip(row.keys(), row)))
-
-
 @bp.route('/<int:id>', methods=['DELETE'])
-def type_delete(id):
+def delete(id):
     ''' food delete'''
     db = get_db()
 
@@ -155,34 +178,39 @@ def type_delete(id):
 
     return success_json()
 
-# TODO
 
+@bp.route('/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    ''' update '''
+    user_id = g.user['id']
 
-@bp.route('/<int:id>', methods=['PUT'])
-def type_update(id):
-    ''' food type update '''
+    food = fetch_food_one(id, user_id)
+    types = get_food_type()
 
-    row = fetch_food_one_with_id(id)
+    if food is None:
+        flash('修改的数据不存在')
+        return redirect(url_for('food.history'))
 
-    if not row:
-        return fail_json('详情数据不存在')
+    if request.method == 'POST':
+        formData = request.form
+        if 'content' in formData:
 
-    formData = request.form
-    if 'content' not in formData:
-        return fail_json('参数异常')
+            content = formData['content']
 
-    content = formData['content']
+            db = get_db()
 
-    db = get_db()
+            db.execute(
+                'UPDATE food_list SET content=:content WHERE autokid = :id',
+                {'content': content, 'id': id}
+            )
 
-    db.execute(
-        'UPDATE food_type SET content=:content WHERE autokid = :id',
-        {'content': content, 'id': id}
-    )
+            db.commit()
 
-    db.commit()
+            return redirect(url_for('food.history'))
+        else:
+            flash('更新的内容不存在')
 
-    return success_json()
+    return render_template('food/update.j2', food=food, types=types)
 
 
 @bp.route('/week/<int:week>/<int:type_id>', methods=['GET', 'POST'])
@@ -202,16 +230,47 @@ def week_update(week, type_id):
     else:
         is_new = True
         content = week_data['content']
+        if content == '':
+            is_new = False
 
     if request.method == 'POST':
         if len(request.form) > 0 \
                 and 'content' in request.form \
                 and request.form['content']:
-            db = get_db()
-            db.execute()
-            db.commit()
 
-        redirect(url_for('food.index'))
+            content = request.form['content']
+
+            db = get_db()
+            timestamp = mtime = int(time.time())
+
+            current_app.logger.info(week_data)
+
+            if week_data is None:
+                db.execute(
+                    'INSERT INTO food_week_list'
+                    ' (user_id,week,type_id,content,ctime,mtime)'
+                    ' VALUES (?,?,?,?,?,?)',
+                    (user_id, week, type_id, content, timestamp, timestamp))
+                db.commit()
+
+            else:
+                db.execute(
+                    'UPDATE food_week_list'
+                    ' SET content=:content,mtime=:mtime'
+                    ' WHERE user_id=:user_id'
+                    ' AND week=:week'
+                    ' AND type_id=:type_id',
+                    {
+                        "content": content,
+                        "mtime": timestamp,
+                        "user_id": user_id,
+                        "week": week,
+                        "type_id": type_id
+                    }
+                )
+                db.commit()
+
+            return redirect(url_for('food.index'))
 
     types = get_food_type()
 
@@ -220,8 +279,6 @@ def week_update(week, type_id):
     renderData['is_new'] = is_new
     renderData['week_name'] = WEEK[str(week)]['name']
     renderData['type_name'] = types[type_id]['name']
-
-    current_app.logger.info(renderData)
 
     return render_template('food/week_update.j2', renderData=renderData)
 
@@ -238,6 +295,26 @@ def get_food_type():
         types[tmp['autokid']] = tmp
 
     return types
+
+
+def fetch_food_one(id, user_id):
+    row = get_db().execute(
+        'SELECT * FROM food_list '
+        ' WHERE user_id = :user_id'
+        ' AND autokid = :autokid'
+        ' ORDER BY autokid DESC LIMIT 0,1',
+        {
+            'user_id': user_id,
+            'autokid': id
+        }
+    ).fetchone()
+
+    if row:
+        row = dict(zip(row.keys(), row))
+
+        return row
+
+    return None
 
 
 def get_data_from_list_with_week(week, type_id, user_id):

@@ -308,7 +308,8 @@ input[type=submit] {
   justify-content: flex-end;
 }
 
-.flex-container .btn {
+.flex-container .btn,
+.btn {
   background: lightgray;
   font-size: 14px;
   margin-left: 2px;
@@ -316,4 +317,75 @@ input[type=submit] {
   padding-left: 2px;
   padding-right: 2px;
   cursor: pointer;
+}
+
+.history-container {
+  margin-top: 1em
+}
+
+.history-container .history-row {
+  display: flex;
+  margin-bottom: 0.5em;
+  position: relative;
+}
+
+.history-row .row-title {
+  width: 120px;
+  background: lightgray
+}
+
+.history-row .row-title p {
+  padding: 2px 5px;
+  margin: 0;
+}
+
+.row-title p.date {
+  font-size: 18px;
+}
+
+.row-title p.other {
+  font-size: 14px;
+}
+
+.history-row .row-content p {
+  padding: 2px 5px;
+  margin: 0;
+}
+
+.history-row .row-content {
+  border: 1px solid lightgray;
+  width: 100%
+}
+
+.history-row-container {
+  position: relative;
+}
+
+.history-row-container .history-row-control-container {
+  position: absolute;
+  left: 0;
+  top: -999px;
+  background: rgba(55, 123, 168, .7);
+  color: #fff;
+  width: 100%;
+  text-align: right;
+}
+
+.history-row-container:hover .history-row-control-container {
+  top: 0;
+}
+
+.history-row-control-container .btn-container {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 28px
+}
+
+.btn-container .link-btn {
+  padding: 0 2px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.01em
 }

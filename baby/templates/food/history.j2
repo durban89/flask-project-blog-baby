@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}Eating History{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+<div class="history-container">
+  {% for food in foods %}
+  <div class="history-row-container">
+    <div class="history-row">
+      <div class="row-title">
+        <p class="date">{{ food['timeStr'] }}</p>
+        <p class="other">{{ food['week_name'] }}/{{ food['type_name'] }}</p>
+      </div>
+      <div class="row-content">
+        <p>{{ food['content'] | safe }}</p>
+      </div>
+    </div>
+    <div class="history-row-control-container">
+      <div class="btn-container">
+        <span class='link-btn' data-url='{{ url_for("food.update", id=food["autokid"]) }}'>Update</span></div>
+      </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery.slim.min.js')}}"></script>
+<script type="text/javascript">
+  $(function(){
+    $('.link-btn').click(function(){
+      var url = $(this).data('url');
+
+      window.location.href = url;
+    });
+  })
+</script>
+{% endblock %}

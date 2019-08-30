@@ -4,7 +4,7 @@
   <h1>{% block title %}Daily Eating{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{url_for('food.create')}}">New</a>
-    <a class="action" href="{{url_for('food.create')}}">History</a>
+    <a class="action" href="{{url_for('food.history')}}">History</a>
   {% endif %}
 {% endblock %}
 
@@ -22,7 +22,7 @@
 		{% for week in weeks %}
 		<tr>
 			<td>{{ weeks[week]['name'] }}</td>
-			{% for type_id in weeks[week]['food'] %}
+			{% for type_id in types %}
 			<td>
 				{% if weeks[week]['food'][type_id] == '' %}
 				<div class="row-container">

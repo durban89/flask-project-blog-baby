@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Week Eating Create{% endblock %}</h1>
+  <h1>
+  {% block title %}
+  {% if renderData['is_new'] %}
+  Week Eating Update
+  {% else %}
+  Week Eating Create
+  {% endif %}
+  {% endblock %}
+  </h1>
 {% endblock %}
 
 {% block content %}

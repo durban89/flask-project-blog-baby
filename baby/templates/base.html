@@ -6,7 +6,10 @@
 <nav>
   <h1>Baby</h1>
   <ul>
+    <li><a href="{{ url_for('blog.index') }}">Posts</a></li>
+    
     {% if g.user %}
+    <li><a href="{{ url_for('food.index') }}">Eating</a></li>
     <li><span>{{g.user['username']}}</span></li>
     <li><a href="{{url_for('auth.logout')}}">Log Out</a></li>
     {% else %}

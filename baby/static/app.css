@@ -383,9 +383,14 @@ input[type=submit] {
   height: 28px
 }
 
-.btn-container .link-btn {
+.btn-container .link-btn,
+.link-btn {
   padding: 0 2px;
   cursor: pointer;
   text-decoration: underline;
   font-size: 0.01em
+}
+
+.link-btn {
+  font-size: 1em
 }

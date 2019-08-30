@@ -79,6 +79,9 @@ def index():
 @bp.route('/history', methods=['GET'])
 def history():
     user_id = g.user['id']
+    page = request.args.get('page', 1)
+    page_size = 10
+    offset = (int(page) - 1) * page_size
 
     db = get_db()
 
@@ -89,12 +92,10 @@ def history():
         ' ft.name as type_name'
         ' FROM food_list as fl'
         ' LEFT JOIN food_type ft ON ft.autokid = fl.type_id'
-        ' WHERE fl.user_id=:user_id'
+        ' WHERE fl.user_id=?'
         ' ORDER BY fl.autokid DESC'
-        ' LIMIT 0, 10',
-        {
-            "user_id": user_id
-        }
+        ' LIMIT ?, ?',
+        (user_id, offset, page_size)
     ).fetchall()
 
     foods = []
@@ -106,7 +107,11 @@ def history():
                 tmp['ctime']).strftime('%Y.%m.%d')
             foods.append(tmp)
 
-    return render_template('food/history.j2', foods=foods)
+    return render_template('food/history.j2',
+                           foods=foods,
+                           page=page,
+                           page_size=page_size
+                           )
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -206,7 +211,7 @@ def update(id):
 
             db.commit()
 
-            return redirect(url_for('food.history'))
+            return redirect(request.referer)
         else:
             flash('更新的内容不存在')
 

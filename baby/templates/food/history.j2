@@ -22,6 +22,24 @@
   </div>
   {% endfor %}
 </div>
+<div style="display: flex;">
+  
+  {% if page|int > 1 %}
+  <span class="link-btn">
+    <a href="{{ url_for('food.history', page=page|int-1) }}">
+      上一页
+    </a>
+  </span>
+  {% endif %}
+  {% if foods|length == page_size %}
+  <span class="link-btn">
+    <a href="{{ url_for('food.history', page=page|int+1) }}">
+      下一页
+    </a>
+  </span>
+  {% endif %}
+
+</div>
 {% endblock %}
 
 {% block script %}

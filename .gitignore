@@ -11,3 +11,4 @@ dist/
 build/
 instance/
 gunicorn.conf
+.env*

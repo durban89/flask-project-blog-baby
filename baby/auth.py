@@ -1,8 +1,18 @@
 #! _*_ coding: utf-8 _*_
 import functools
+import logging
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+    jsonify,
+    current_app
 )
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -68,12 +78,17 @@ def login():
 
         if user is None:
             error = 'Incorrect username.'
+            current_app.logger.error(
+                '%s logged fail - username is wrong', username)
         elif not check_password_hash(user['password'], password):
+            current_app.logger.error(
+                '%s logged fail - password is wrong', username)
             error = 'Incorrect password.'
 
         if error is None:
             session.clear()
             session['user_id'] = user['id']
+            logging.info('%s logged successfully', username)
             return redirect(url_for('blog.index'))
 
         flash(error)

@@ -10,6 +10,6 @@
 
 {% block content %}
   <article class="post">
-    <p class="body">{{ post['body'] }}</p>
+    <p class="body">{{ post['body']|safe }}</p>
   </article>
 {% endblock %}

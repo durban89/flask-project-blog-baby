@@ -71,8 +71,6 @@ def index():
 
         weeks[week]['food'] = weeks_food
 
-    current_app.logger.info(weeks)
-
     return render_template('food/index.j2', weeks=weeks, types=types)
 
 
@@ -168,8 +166,6 @@ def create():
 
     types = get_food_type()
 
-    current_app.logger.info(types)
-
     return render_template('food/create.j2', types=types)
 
 
@@ -247,8 +243,6 @@ def week_update(week, type_id):
 
             db = get_db()
             timestamp = mtime = int(time.time())
-
-            current_app.logger.info(week_data)
 
             if week_data is None:
                 db.execute(

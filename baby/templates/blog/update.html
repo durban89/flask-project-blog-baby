@@ -2,6 +2,7 @@
 
 {% block top_link %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/simditor/simditor.css')}}" />
+<link rel="stylesheet" href="{{url_for('static', filename='css/jquery-ui.min.css')}}" />
 {% endblock %}
 
 {% block header %}
@@ -35,6 +36,7 @@
 
 {% block script %}
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/jquery.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-ui.min.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/module.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/hotkeys.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/simditor.js')}}"></script>
@@ -42,6 +44,9 @@
 var editor = new Simditor({
   textarea: $('#body')
   //optional options
+});
+$( "#date" ).datepicker({
+  dateFormat: "yy-mm-dd"
 });
 </script>
 {% endblock %}

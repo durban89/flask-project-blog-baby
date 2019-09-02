@@ -1,5 +1,8 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
+DROP TABLE IF EXISTS food_list;
+DROP TABLE IF EXISTS food_week_list;
+DROP TABLE IF EXISTS food_type;
 
 CREATE TABLE user (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,8 +13,41 @@ CREATE TABLE user (
 CREATE TABLE post (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     author_id INTEGER NOT NULL,
+    the_date VARCHAR(32) NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     title TEXT NOT NULL,
     body TEXT NOT NULL,
     FOREIGN KEY (author_id) REFERENCES user (id)
-)
+);
+
+CREATE TABLE food_list (
+	autokid INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    week INTEGER NOT NULL,
+    type_id INTEGER NOT NULL,
+    the_date INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    ctime INTEGER NOT NULL,
+    mtime INTEGER NOT NULL
+);
+
+CREATE TABLE food_week_list (
+	autokid INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    week INTEGER NOT NULL,
+    type_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    ctime INTEGER NOT NULL,
+    mtime INTEGER NOT NULL,
+    UNIQUE(user_id,week,type_id)
+);
+
+CREATE TABLE food_type (
+	autokid INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(32) NOT NULL,
+    sort INTEGER NOT NULL,
+    ctime INTEGER NOT NULL,
+    mtime INTEGER NOT NULL,
+    UNIQUE(name)
+);

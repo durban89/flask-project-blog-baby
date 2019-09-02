@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Daily Eating Create{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+  <div class="input-group">
+    <label for="type" class="label-type">Type</label>
+    <div style="position: relative;">
+      <input id='type_id' class="input-type" name='type_id' value="{{ request.form['type_id'] }}" required />
+      <div class="menu-select">
+        {% if request.form['type_id'] %}
+        <span class='select-content'>{{ types[request.form['type_id']|int]['name'] }}</span>
+        {% else %}
+        <span class='select-content'>Select Type</span>
+        {% endif %}
+      </div>
+      <div class="menu">
+        {% for type in types %}
+        <div class="menu-item" data-value="{{ types[type]['autokid'] }}" data-text="{{ types[type]['name'] }}">{{ types[type]['name'] }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label for="content" class="label-content">Content</label>
+    <textarea rows="2" id='content' name='content' class="textarea-content" required>{{ request.form['content'] }}</textarea>
+  </div>
+  <button type="submit" class="button-submit">Save</button>
+</form>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery.slim.min.js')}}"></script>
+<script type="text/javascript">
+  $(function(){
+    $('.menu-select').click(function(o){
+      console.log(o);
+      if ($('.menu').hasClass('active')) {
+        $('.menu').removeClass('active');
+      } else {
+        $('.menu').addClass('active');
+      }
+    });
+
+    $('.menu-item').click(function(o) {
+      $('.menu-item').siblings().removeClass('selected');
+
+      if ($('.menu').hasClass('active')) {
+        $('.menu').removeClass('active');
+      }
+
+      $(this).addClass('selected');
+
+      var value = $(this).data('value');
+      var text = $(this).data('text');
+      
+
+      $('.select-content').text(text);
+      $('#type_id').val(value);
+    });
+  })
+</script>
+{% endblock %}

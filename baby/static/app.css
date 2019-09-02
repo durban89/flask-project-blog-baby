@@ -117,9 +117,18 @@ header .action {
   margin-bottom: 0.5em;
 }
 
-.content input,
-.content textarea {
+.content .inner-nav-container {
+  margin-top: 1em;
+}
+
+.content .slash {
+  margin-left: 5px;
+  margin-right: 5px
+}
+
+.content .input-group {
   margin-bottom: 1em;
+  width: 100%;
 }
 
 .content textarea {
@@ -127,11 +136,261 @@ header .action {
   resize: vertical;
 }
 
-input.danger {
+input.danger,
+.content button.danger {
   color: #cc2f2e;
 }
 
 input[type=submit] {
   align-self: start;
   min-width: 10em;
+}
+
+.content label.label-title,
+.content label.label-username,
+.content label.label-password,
+.content label.label-date,
+.content label.label-body,
+.content label.label-type,
+.content label.label-nav,
+.content label.label-content {
+  width: 60px;
+  background: lightgray;
+  display: flex;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.content label.label-nav.nav {
+  min-width: 100px
+}
+
+.content label.label-date {
+  width: 150px;
+}
+
+.content label.label-username,
+.content label.label-password,
+.content label.label-content {
+  width: 90px;
+}
+
+.content input.input-title,
+.content input.input-username,
+.content input.input-password,
+.content input.input-date,
+.content input.input-type,
+.content select.select-type,
+.content textarea.textarea-body,
+.content textarea.textarea-content {
+  border: 1px solid lightgray;
+  box-shadow: none;
+  height: 35px;
+  font-size: 18px;
+  padding: 0 0.5em;
+  outline: none;
+  width: 910px;
+}
+
+.content select.select-type {
+  background: #fff;
+  border-radius: 0;
+  border: 0px;
+  outline: 1px solid rgb(204, 204, 204);
+}
+
+.content button.button-submit {
+  width: 100px;
+  height: 40px;
+  background: lightgray;
+  font-size: 14px;
+  outline: none;
+  box-shadow: none;
+  border: none;
+  font-weight: bold;
+  color: #000000;
+}
+
+.content button.button-submit:active {
+  color: lightgray;
+  background: #000000;
+}
+
+.content button.danger {
+  color: #cc2f2e;
+}
+
+/*select menu*/
+.menu-select {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid lightgray;
+}
+
+.menu-select .select-content {
+  padding-left: 5px;
+}
+
+.menu {
+  display: none;
+}
+
+.menu.active {
+  display: block;
+  position: absolute;
+  background: #fff;
+  width: 100%;
+  border-left: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+  border-right: 1px solid lightgray;
+  top: 35px;
+}
+
+.menu-item {
+  height: 35px;
+  display: flex;
+  align-items: center;
+  padding-left: 5px;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item.selected {
+  background: lightgray;
+}
+
+.food-table {
+  border-spacing: 0;
+  width: 100%;
+}
+
+.food-table tr td {
+  border-bottom: 1px solid #ddd;
+  height: 35px;
+  text-align: left;
+  min-width: 100px;
+  font-size: 18px;
+  border-right: 0;
+  padding: 0;
+}
+
+.food-table tr td .row-container {
+  position: relative;
+  height: 35px;
+  display: flex;
+  align-items: center;
+}
+
+.row-container .control-container {
+  position: absolute;
+  left: -9999px;
+  width: 100%;
+  height: 35px;
+}
+
+.row-container:hover .control-container {
+  left: 0;
+}
+
+.control-container .flex-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  height: 35px;
+  background: rgba(255, 255, 255, .8);
+  justify-content: flex-end;
+}
+
+.flex-container .btn,
+.btn {
+  background: lightgray;
+  font-size: 14px;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  cursor: pointer;
+}
+
+.history-container {
+  margin-top: 1em
+}
+
+.history-container .history-row {
+  display: flex;
+  margin-bottom: 0.5em;
+  position: relative;
+}
+
+.history-row .row-title {
+  width: 120px;
+  background: lightgray
+}
+
+.history-row .row-title p {
+  padding: 2px 5px;
+  margin: 0;
+}
+
+.row-title p.date {
+  font-size: 18px;
+}
+
+.row-title p.other {
+  font-size: 14px;
+}
+
+.history-row .row-content p {
+  padding: 2px 5px;
+  margin: 0;
+}
+
+.history-row .row-content {
+  border: 1px solid lightgray;
+  width: 100%
+}
+
+.history-row-container {
+  position: relative;
+}
+
+.history-row-container .history-row-control-container {
+  position: absolute;
+  left: 0;
+  top: -999px;
+  background: rgba(55, 123, 168, .7);
+  color: #fff;
+  width: 100%;
+  text-align: right;
+}
+
+.history-row-container:hover .history-row-control-container {
+  top: 0;
+}
+
+.history-row-control-container .btn-container {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 28px
+}
+
+.btn-container .link-btn,
+.link-btn {
+  padding: 0 2px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.01em
+}
+
+.link-btn {
+  font-size: 1em
 }

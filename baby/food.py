@@ -16,6 +16,7 @@ from flask import (
     url_for
 )
 from baby.db import get_db
+from baby.auth import login_required
 
 bp = Blueprint('food', __name__, url_prefix='/food')
 
@@ -52,6 +53,7 @@ WEEK = {
 
 
 @bp.route('/', methods=['GET'])
+@login_required
 def index():
     '''food list'''
     user_id = g.user['id']
@@ -75,6 +77,7 @@ def index():
 
 
 @bp.route('/history', methods=['GET'])
+@login_required
 def history():
     user_id = g.user['id']
     page = request.args.get('page', 1)
@@ -113,6 +116,7 @@ def history():
 
 
 @bp.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
     ''' food create'''
     if request.method == 'POST':
@@ -170,6 +174,7 @@ def create():
 
 
 @bp.route('/<int:id>', methods=['DELETE'])
+@login_required
 def delete(id):
     ''' food delete'''
     db = get_db()
@@ -181,6 +186,7 @@ def delete(id):
 
 
 @bp.route('/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update(id):
     ''' update '''
     user_id = g.user['id']
@@ -215,6 +221,7 @@ def update(id):
 
 
 @bp.route('/week/<int:week>/<int:type_id>', methods=['GET', 'POST'])
+@login_required
 def week_update(week, type_id):
     '''更新'''
     user_id = g.user['id']

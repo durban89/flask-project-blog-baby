@@ -11,10 +11,11 @@ from flask import (
 from raven.contrib.flask import Sentry
 from logging.config import dictConfig
 from logging.handlers import SMTPHandler
+from baby.extensions import socketio
 
 
 def error_handler(e):
-    return 'bad request!', 400
+    return 'bad bad bad request!', 400
 
 
 def logging_common_formatter():
@@ -80,30 +81,10 @@ def register_sentry(app):
 
 
 def create_app(test_config=None):
-    # config logger
-    dictConfig({
-        'version': 1,
-        'formatters': {
-            'default': {
-                'format': '[%(asctime)s] %(levelname)s \
-in %(module)s: %(message)s ',
-            }
-        },
-        'handlers': {
-            'wsgi': {
-                'class': 'logging.StreamHandler',
-                'stream': 'ext://flask.logging.wsgi_errors_stream',
-                'formatter': 'default'
-            }
-        },
-        'root': {
-            'level': 'INFO',
-            'handlers': ['wsgi']
-        }
-    })
-
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+
+    # if not app.debug:
 
     app.config.from_mapping(
         SECRET_KEY='dev',
@@ -123,6 +104,35 @@ in %(module)s: %(message)s ',
     # Error Handler
     app.register_error_handler(400, error_handler)
 
+    # Register Extensions
+    if app.debug:
+        socketio.init_app(app, logger=True, engineio_logger=True)
+    else:
+        socketio.init_app(app)
+
+    # config logger
+    if not app.debug:
+        dictConfig({
+            'version': 1,
+            'formatters': {
+                'default': {
+                    'format': '[%(asctime)s] %(levelname)s \
+            in %(module)s: %(message)s ',
+                }
+            },
+            'handlers': {
+                'wsgi': {
+                    'class': 'logging.StreamHandler',
+                    'stream': 'ext://flask.logging.wsgi_errors_stream',
+                    'formatter': 'default'
+                }
+            },
+            'root': {
+                'level': 'INFO',
+                'handlers': ['wsgi']
+            }
+        })
+
     @app.route('/baby')
     def index():
         return 'Baby'
@@ -135,6 +145,9 @@ in %(module)s: %(message)s ',
 
     from . import food
     app.register_blueprint(food.bp)
+
+    from . import chat
+    app.register_blueprint(chat.bp)
 
     from . import api_food
     app.register_blueprint(api_food.bp)
@@ -164,4 +177,4 @@ in %(module)s: %(message)s ',
 application = create_app()
 
 if __name__ == "__main__":
-    application.run()
+    socketio.run(application)

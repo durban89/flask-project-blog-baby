@@ -3,6 +3,7 @@
 #
 
 import random
+import functools
 
 from flask import (
     Blueprint,
@@ -13,7 +14,14 @@ from flask import (
     session
 )
 from baby.extensions import socketio
-from flask_socketio import emit, join_room, leave_room, close_room, rooms
+from flask_socketio import (
+    emit,
+    join_room,
+    leave_room,
+    close_room,
+    rooms,
+    disconnect
+)
 
 online_nicks = []
 online_sid = []
@@ -40,7 +48,20 @@ def index():
     return render_template('/chat/index.j2', avatar_bg_color=color)
 
 
+def authenticated(f):
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        # 授权判断
+        user_id = session.get('user_id', 0)
+        if user_id == 0:
+            disconnect()
+        else:
+            return f(*args, **kwargs)
+    return wrapped
+
+
 @socketio.on('connect', namespace='/chat')
+@authenticated
 def handle_connect():
     emit('response', {
         'data': 'Connected',
@@ -49,6 +70,7 @@ def handle_connect():
 
 
 @socketio.on('message', namespace='/chat')
+@authenticated
 def handle_message(message):
     # 信息发到服务器进行过滤
 
@@ -56,6 +78,7 @@ def handle_message(message):
 
 
 @socketio.on('broadcast_event', namespace='/chat')
+@authenticated
 def handle_broadcast_event(msg):
     global online_num
     nick = None
@@ -101,16 +124,19 @@ def handle_broadcast_event(msg):
 
 
 @socketio.on('event', namespace='/chat')
+@authenticated
 def handle_event(msg):
     emit('response', {'data': msg['data'], 'type': msg['type']})
 
 
 @socketio.on('ping', namespace='/chat')
+@authenticated
 def ping_pong():
     emit('pong')
 
 
 @socketio.on('join', namespace='/chat')
+@authenticated
 def hanle_join(message):
     emit('response', {
         'data': 'In Rooms',
@@ -119,6 +145,7 @@ def hanle_join(message):
 
 
 @socketio.on('leave', namespace='/chat')
+@authenticated
 def handle_leave(message):
     emit('response', {
         'data': 'Out Rooms',
@@ -127,6 +154,7 @@ def handle_leave(message):
 
 
 @socketio.on('disconnect', namespace='/chat')
+@authenticated
 def handle_disconnect():
     global online_num
     nick = session.get('nick')

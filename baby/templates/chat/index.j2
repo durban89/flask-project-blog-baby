@@ -115,7 +115,7 @@ function updateOnlineNum(num) {
   $('#online-num').text(num);
 }
 
-var socket = io('/chat');
+var socket = io('/chat?q=baby');
 socket.on('connect', function () {
   socket.emit('join', {data: 'Join room one'});
 });

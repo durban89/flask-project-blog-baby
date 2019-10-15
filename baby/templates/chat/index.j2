@@ -58,6 +58,7 @@ Chat
   <div class="">
     <button id='submit' type="button" style="height: 60px;width: 200px; font-size: 18px">提交</button>
     <input placeholder="您的昵称" type="text" name='nick' id='nick' class="nick" />
+    <span style="font-style: 18px" id='online-num'>0</span>
   </div>
   <div>
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
@@ -110,6 +111,10 @@ function scrollBottom() {
   $('.chat-container').scrollTop(height);
 }
 
+function updateOnlineNum(num) {
+  $('#online-num').text(num);
+}
+
 var socket = io('/chat');
 socket.on('connect', function () {
   socket.emit('join', {data: 'Join room one'});
@@ -127,6 +132,19 @@ socket.on('response', function (msg) {
   } else {
     addOtherMessage(msg.data, msg.nick || '', msg.avatar_bg_color);
   }
+
+  updateOnlineNum(typeof msg.online_num == 'undefined' ? 0 : msg.online_num)
+});
+
+socket.on('error', function (msg) {
+  console.log(msg);
+  if (msg.type == 'alert') {
+    alert(msg.data);
+  } else {
+    console.log(msg)
+  }
+  
+  updateOnlineNum(msg.online_num || 0)
 });
 
 var pingPongTimes = [];

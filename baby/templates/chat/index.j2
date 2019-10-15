@@ -24,20 +24,40 @@ Chat
     height: 60px;
     display: inline-block;
     text-align: center;
-    border: 1px solid #ccc;
+    border: 1px solid {{ avatar_bg_color }};
     border-radius: 30px;
+    line-height: 60px;
+    background: {{ avatar_bg_color }};
+    color: #fff;
+  }
+
+  .chat-container {
+    border: 1px dashed #ccc;
+    padding: 15px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 200px;
+  }
+
+  .nick {
+    height: 50px;
+    padding-top: 2px;
+    font-size: 18px;
+    text-align: center;
+    padding-bottom: 4px;
   }
 </style>
 <div>
-  <h2 style="text-align: center">ChatRoom</h2>
-  <div class="" id='chat-container'>
-    
+  <h2 style="text-align: center">ChatRoom[Broadcast]</h2>
+  <div class="chat-container">
+    <div id='chat-container'></div>
   </div>
   <div class="" style="margin-top: 10px">
     <textarea id='content' style="width: 100%; " rows='2'></textarea>
   </div>
   <div class="">
     <button id='submit' type="button" style="height: 60px;width: 200px; font-size: 18px">提交</button>
+    <input placeholder="您的昵称" type="text" name='nick' id='nick' class="nick" />
   </div>
   <div>
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
@@ -48,6 +68,7 @@ Chat
 <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
 <script type="text/javascript" charset="utf-8">
+var avatar_bg_color = '{{ avatar_bg_color }}';
 var submitBtn = $('#submit');
 var chatRoomContainer = $('#chat-container');
 var contentContainer = $('#content');
@@ -63,22 +84,30 @@ function addSelfMessage(message) {
   messageContainer.text(message);
   selfContainer.append(messageContainer);
   chatRoomContainer.append(selfContainer);
+  scrollBottom();
 }
 
-function addOtherMessage(message) {
+function addOtherMessage(message, nick, avatar_bg_color) {
   var otherContainer = $('<div class="other-container"></div>');
-  var avatarContainer = $('<div><span class="avatar">头像</span></div>');
+  var avatarContainer = $('<div><span class="avatar" style="background:'+avatar_bg_color+';border: 1px solid '+avatar_bg_color+'">'+nick+'</span></div>');
   otherContainer.append(avatarContainer);
   var messageContainer = $('<p></p>');
   messageContainer.text(message);
   otherContainer.append(messageContainer);
   chatRoomContainer.append(otherContainer);
+  scrollBottom();
 }
 
 function addTipsMessage(message) {
   var tipsContainer = $('<div class="tips-container"></div>');
   tipsContainer.text(message);
   chatRoomContainer.append(tipsContainer);
+  scrollBottom();
+}
+
+function scrollBottom() {
+  var height = $('#chat-container').height();
+  $('.chat-container').scrollTop(height);
 }
 
 var socket = io('/chat');
@@ -86,25 +115,28 @@ socket.on('connect', function () {
   socket.emit('join', {data: 'Join room one'});
 });
 
-socket.on('my_response', function (msg) {
-  console.log('my response data ', msg.data);
-  console.log('my response type ', msg.type);
+socket.on('disconnect', function () {
+  addTipsMessage('Server Disconnect');
+});
+
+
+socket.on('response', function (msg) {
+  console.log(msg);
   if (msg.type == 'tips') {
     addTipsMessage(msg.data);
   } else {
-    addOtherMessage(msg.data);
+    addOtherMessage(msg.data, msg.nick || '', msg.avatar_bg_color);
   }
-  
 });
 
 var pingPongTimes = [];
 var startTime;
 window.setInterval(function() {
   startTime = (new Date).getTime();
-  socket.emit('my_ping');
+  socket.emit('ping');
 }, 1000);
 
-socket.on('my_pong', function() {
+socket.on('pong', function() {
   var latency = (new Date).getTime() - startTime;
   pingPongTimes.push(latency);
   pingPongTimes = pingPongTimes.slice(-30); // keep last 30 samples
@@ -117,7 +149,16 @@ socket.on('my_pong', function() {
 });
 
 submitBtn.on('click', function(event) {
-  socket.emit('my_event', {data: contentContainer.val(), type: 'self'});
+  var nick = $('#nick').val();
+  if (!nick) {
+    return alert('昵称不能为空')
+  }
+  socket.emit('broadcast_event', {
+    data: contentContainer.val(),
+    type: 'self',
+    nick: nick,
+    avatar_bg_color: avatar_bg_color,
+  });
   contentContainer.val('');
   return true;
 });

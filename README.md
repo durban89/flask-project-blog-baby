@@ -63,26 +63,26 @@ stdout_logfile = /var/tmp/baby_stdout.log
 
 ```
 server {
-	charset utf-8;
+  charset utf-8;
 
-	client_max_body_size 128M;
+  client_max_body_size 128M;
 
-	listen 80;
+  listen 80;
 
-	server_name flask1.walkerfree.local; # 这是HOST机器的外部域名，用地址也行
+  server_name flask1.walkerfree.local; # 这是HOST机器的外部域名，用地址也行
 
-	access_log /var/log/flask1.walkerfree.local.access.log;
-	error_log /var/log/flask1.walkerfree.local.error.log;
+  access_log /var/log/flask1.walkerfree.local.access.log;
+  error_log /var/log/flask1.walkerfree.local.error.log;
 
-	location / {
-		proxy_pass http://127.0.0.1:8000; # 这里是指向 gunicorn host 的服务地址
-		proxy_set_header Host $host;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-	}
+  location / {
+    proxy_pass http://127.0.0.1:8000; # 这里是指向 gunicorn host 的服务地址
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
 
-	location ~ /\.(git|svn|ht) {
-		deny all;
-	}
+  location ~ /\.(git|svn|ht) {
+    deny all;
+  }
 }
 ```
 
@@ -110,4 +110,48 @@ pytest
 coverage run -m pytest
 coverage report
 coverage html
+```
+
+# SocketIO 开发说明
+
+简单nginx实例配置
+
+```
+server {
+  charset utf-8;
+
+  client_max_body_size 128M;
+
+  listen 80;
+
+  server_name flask.baby.local;
+
+  access_log /var/log/flask.baby.local.access.log;
+  error_log /var/log/flask.baby.local.error.log;
+
+  location / {
+    proxy_pass http://127.0.0.1:5000;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+
+  location /socket.io/ {
+    proxy_pass http://127.0.0.1:5000/socket.io/;
+    proxy_set_header Connection "keep-alive";
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_redirect off;
+    proxy_buffering off;
+  }
+
+  location ~ /\.(git|svn|ht) {
+    deny all;
+  }
+}
 ```

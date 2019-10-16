@@ -1,0 +1,184 @@
+{% extends "base.j2" %}
+{% block header %}
+<h1>
+{% block title %}
+Chat  
+{% endblock %}
+</h1>
+{% endblock %}
+{% block content %}
+<style type="text/css">
+  .tips-container {
+    text-align: center;
+    color: #ccc;
+    font-size: 18px;
+  }
+
+  .other-container,
+  .self-container {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 5px
+  }
+  .avatar {
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    text-align: center;
+    border: 1px solid {{ avatar_bg_color }};
+    border-radius: 30px;
+    line-height: 60px;
+    background: {{ avatar_bg_color }};
+    color: #fff;
+  }
+
+  .chat-container {
+    border: 1px dashed #ccc;
+    padding: 15px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 200px;
+  }
+
+  .nick {
+    height: 50px;
+    padding-top: 2px;
+    font-size: 18px;
+    text-align: center;
+    padding-bottom: 4px;
+  }
+</style>
+<div>
+  <h2 style="text-align: center">ChatRoom[Broadcast]</h2>
+  <div class="chat-container">
+    <div id='chat-container'></div>
+  </div>
+  <div class="" style="margin-top: 10px">
+    <textarea id='content' style="width: 100%; " rows='2'></textarea>
+  </div>
+  <div class="">
+    <button id='submit' type="button" style="height: 60px;width: 200px; font-size: 18px">提交</button>
+    <input placeholder="您的昵称" type="text" name='nick' id='nick' class="nick" />
+    <span style="font-style: 18px" id='online-num'>0</span>
+  </div>
+  <div>
+    <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
+<script type="text/javascript" charset="utf-8">
+var avatar_bg_color = '{{ avatar_bg_color }}';
+var submitBtn = $('#submit');
+var chatRoomContainer = $('#chat-container');
+var contentContainer = $('#content');
+
+var tipsContainer = $('<div class="tips-container"></div>');
+var otherContainer = $('<div class="other-container"></div>');
+
+function addSelfMessage(message) {
+  var selfContainer = $('<div class="self-container"></div>');
+  var avatarContainer = $('<div style="text-align:right"><span class="avatar">头像</span></div>');
+  selfContainer.append(avatarContainer);
+  var messageContainer = $('<p></p>');
+  messageContainer.text(message);
+  selfContainer.append(messageContainer);
+  chatRoomContainer.append(selfContainer);
+  scrollBottom();
+}
+
+function addOtherMessage(message, nick, avatar_bg_color) {
+  var otherContainer = $('<div class="other-container"></div>');
+  var avatarContainer = $('<div><span class="avatar" style="background:'+avatar_bg_color+';border: 1px solid '+avatar_bg_color+'">'+nick+'</span></div>');
+  otherContainer.append(avatarContainer);
+  var messageContainer = $('<p></p>');
+  messageContainer.text(message);
+  otherContainer.append(messageContainer);
+  chatRoomContainer.append(otherContainer);
+  scrollBottom();
+}
+
+function addTipsMessage(message) {
+  var tipsContainer = $('<div class="tips-container"></div>');
+  tipsContainer.text(message);
+  chatRoomContainer.append(tipsContainer);
+  scrollBottom();
+}
+
+function scrollBottom() {
+  var height = $('#chat-container').height();
+  $('.chat-container').scrollTop(height);
+}
+
+function updateOnlineNum(num) {
+  $('#online-num').text(num);
+}
+
+var socket = io('/chat?q=baby');
+socket.on('connect', function () {
+  socket.emit('join', {data: 'Join room one'});
+});
+
+socket.on('disconnect', function () {
+  addTipsMessage('Server Disconnect');
+});
+
+
+socket.on('response', function (msg) {
+  console.log(msg);
+  if (msg.type == 'tips') {
+    addTipsMessage(msg.data);
+  } else {
+    addOtherMessage(msg.data, msg.nick || '', msg.avatar_bg_color);
+  }
+
+  updateOnlineNum(typeof msg.online_num == 'undefined' ? 0 : msg.online_num)
+});
+
+socket.on('error', function (msg) {
+  console.log(msg);
+  if (msg.type == 'alert') {
+    alert(msg.data);
+  } else {
+    console.log(msg)
+  }
+  
+  updateOnlineNum(msg.online_num || 0)
+});
+
+var pingPongTimes = [];
+var startTime;
+window.setInterval(function() {
+  startTime = (new Date).getTime();
+  socket.emit('ping');
+}, 1000);
+
+socket.on('pong', function() {
+  var latency = (new Date).getTime() - startTime;
+  pingPongTimes.push(latency);
+  pingPongTimes = pingPongTimes.slice(-30); // keep last 30 samples
+  var sum = 0;
+  for (var i = 0; i < pingPongTimes.length; i++){
+    sum += pingPongTimes[i];
+  }
+      
+  $('#ping-pong').text(Math.round(10 * sum / pingPongTimes.length) / 10);
+});
+
+submitBtn.on('click', function(event) {
+  var nick = $('#nick').val();
+  if (!nick) {
+    return alert('昵称不能为空')
+  }
+  socket.emit('broadcast_event', {
+    data: contentContainer.val(),
+    type: 'self',
+    nick: nick,
+    avatar_bg_color: avatar_bg_color,
+  });
+  contentContainer.val('');
+  return true;
+});
+</script>
+{% endblock %}

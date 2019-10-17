@@ -18,9 +18,9 @@
 </div>
 
 <form method="POST">
-  <div class="input-group">
+  <div class="form-group">
     <label for="content" class="label-content">Content</label>
-    <textarea rows="2" id='content' name='content' class="textarea-content" required>{{ request.form['content'] or renderData['content'] }}</textarea>
+    <textarea rows="2" id='content' name='content' class="form-control" required>{{ request.form['content'] or renderData['content'] }}</textarea>
   </div>
   <button type="submit" class="button-submit">Save</button>
 </form>

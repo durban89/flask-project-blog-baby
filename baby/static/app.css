@@ -10,9 +10,6 @@ h1 {
   margin: 1rem 0;
 }
 
-a {
-  color: #377ba8;
-}
 
 hr {
   border: none;
@@ -119,11 +116,6 @@ header .action {
 .content .input-group {
   margin-bottom: 1em;
   width: 100%;
-}
-
-.content textarea {
-  min-height: 12em;
-  resize: vertical;
 }
 
 input.danger,
@@ -296,17 +288,6 @@ input[type=submit] {
   height: 35px;
   background: rgba(255, 255, 255, .8);
   justify-content: flex-end;
-}
-
-.flex-container .btn,
-.btn {
-  background: lightgray;
-  font-size: 14px;
-  margin-left: 2px;
-  margin-right: 2px;
-  padding-left: 2px;
-  padding-right: 2px;
-  cursor: pointer;
 }
 
 .history-container {

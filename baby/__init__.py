@@ -177,4 +177,4 @@ def create_app(test_config=None):
 application = create_app()
 
 if __name__ == "__main__":
-    socketio.run(application)
+    socketio.run(application, debug=application.debug)

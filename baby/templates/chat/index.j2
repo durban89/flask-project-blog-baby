@@ -40,24 +40,24 @@ Chat
   }
 </style>
 
-<fieldset class="layui-elem-field">
+<fieldset>
   <legend>ChatRoom[Broadcast]</legend>
-  <div class="layui-field-box">
+  <div>
     <div class="chat-container">
       <div id='chat-container'></div>
     </div>
   </div>
 </fieldset>
 
-<form class="layui-form" action="">
-  <div class="layui-form-item">
-    <textarea name="desc" id='content' placeholder="输入你要说的话" class="layui-textarea"></textarea>
+<form class="">
+  <div class="form-group">
+    <textarea name="desc" id='content' placeholder="输入你要说的话" class="form-control" rows="3"></textarea>
+  </div>
+  <div class="form-group">
+    <input type="text" name="nick" id='nick' required placeholder="您的昵称" autocomplete="off" class="form-control form-control-lg">
   </div>
   <div class="layui-form-item">
-    <input type="text" name="nick" id='nick' required  lay-verify="required" placeholder="您的昵称" autocomplete="off" class="layui-input">
-  </div>
-  <div class="layui-form-item">
-    <button id='submit' type="button" class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+    <button id='submit' type="button" class="btn btn-primary">立即提交</button>
     <span class="layui-btn layui-btn-primary">在线<span id='online-num'>0</span>人</span>
   </div>
 </form>
@@ -72,7 +72,6 @@ Chat
 
 {% endblock %}
 {% block script %}
-<script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
 <script type="text/javascript" charset="utf-8">
 var avatar_bg_color = '{{ avatar_bg_color }}';

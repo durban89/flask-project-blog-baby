@@ -6,7 +6,7 @@
 
 {% block content %}
 <form method="POST">
-  <div class="input-group">
+  <div class="form-group">
     <label for="type" class="label-type">Type</label>
     <div style="position: relative;">
       <input id='type_id' class="input-type" name='type_id' value="{{ request.form['type_id'] }}" required />
@@ -25,9 +25,9 @@
     </div>
   </div>
 
-  <div class="input-group">
+  <div class="form-group">
     <label for="content" class="label-content">Content</label>
-    <textarea rows="2" id='content' name='content' class="textarea-content" required>{{ request.form['content'] }}</textarea>
+    <textarea rows="2" id='content' name='content' class="form-control" required>{{ request.form['content'] }}</textarea>
   </div>
   <button type="submit" class="button-submit">Save</button>
 </form>

@@ -11,17 +11,17 @@
 
 {% block content %}
   <form method="POST">
-    <div class="input-group">
+    <div class="form-group">
       <label for="title" class="label-title">Title</label>
-      <input id='title' class="input-title" name='title' value="{{ request.form['title'] }}" required/>
+      <input id='title' class="form-control" name='title' value="{{ request.form['title'] }}" required/>
     </div>
   
-    <div class="input-group">
+    <div class="form-group">
       <label for="date" class="label-date">Publication date</label>
-      <input class='input-date' id="date" name="date" value="{{ request.form['date'] }}" autocomplete="off" required />
+      <input class='form-control' id="date" name="date" value="{{ request.form['date'] }}" autocomplete="off" required />
     </div>
 
-    <div class="input-group">
+    <div class="form-group">
       <label for="body" class="label-body">Body</label>
       <textarea id='body' name='body' class="textarea-body" value="{{ request.form['body'] }}"></textarea>
     </div>

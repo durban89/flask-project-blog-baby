@@ -1,13 +1,7 @@
-html {
-  font-family: sans-serif;
-  background: #eee;
-  padding: 1rem;
-}
-
-body {
-  max-width: 960px;
-  margin: 0 auto;
-  background: white;
+.header fieldset {
+  border: none;
+  padding: 0;
+  border-top: 1px solid #eee;
 }
 
 h1 {
@@ -16,9 +10,6 @@ h1 {
   margin: 1rem 0;
 }
 
-a {
-  color: #377ba8;
-}
 
 hr {
   border: none;
@@ -54,10 +45,6 @@ nav ul li span,
 header .action {
   display: block;
   padding: 0.5rem;
-}
-
-.content {
-  padding: 0 1rem 1rem;
 }
 
 .content>header {
@@ -129,11 +116,6 @@ header .action {
 .content .input-group {
   margin-bottom: 1em;
   width: 100%;
-}
-
-.content textarea {
-  min-height: 12em;
-  resize: vertical;
 }
 
 input.danger,
@@ -306,17 +288,6 @@ input[type=submit] {
   height: 35px;
   background: rgba(255, 255, 255, .8);
   justify-content: flex-end;
-}
-
-.flex-container .btn,
-.btn {
-  background: lightgray;
-  font-size: 14px;
-  margin-left: 2px;
-  margin-right: 2px;
-  padding-left: 2px;
-  padding-right: 2px;
-  cursor: pointer;
 }
 
 .history-container {

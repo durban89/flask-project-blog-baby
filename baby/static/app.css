@@ -1,13 +1,7 @@
-html {
-  font-family: sans-serif;
-  background: #eee;
-  padding: 1rem;
-}
-
-body {
-  max-width: 960px;
-  margin: 0 auto;
-  background: white;
+.header fieldset {
+  border: none;
+  padding: 0;
+  border-top: 1px solid #eee;
 }
 
 h1 {
@@ -54,10 +48,6 @@ nav ul li span,
 header .action {
   display: block;
   padding: 0.5rem;
-}
-
-.content {
-  padding: 0 1rem 1rem;
 }
 
 .content>header {

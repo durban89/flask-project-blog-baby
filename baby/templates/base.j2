@@ -1,31 +1,49 @@
 <!DOCTYPE html>
-<title>{% block title %}{% endblock %} - Baby</title>
-{% block top_link %}{% endblock %}
-<link rel="stylesheet" href="{{url_for('static', filename='app.css')}}" />
-{% block end_link %}{% endblock %}
-<nav>
-  <h1>Baby</h1>
-  <ul>
-    <li><a href="{{ url_for('blog.index') }}">Posts</a></li>
-    
-    {% if g.user %}
-    <li><a href="{{ url_for('food.index') }}">Eating</a></li>
-    <li><span>|</span></li>
-    <li><span>{{g.user['username']}}</span></li>
-    <li><a href="{{url_for('auth.logout')}}">Log Out</a></li>
-    {% else %}
-    <li><a href="{{url_for('auth.register')}}">Register</a></li>
-    <li><a href="{{url_for('auth.login')}}">Log In</a></li>
-    {% endif %}
-  </ul>
-</nav>
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-  <div class="flash">{{message}}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
-</section>
-{% block script %}{% endblock %}
+<head>
+  <title>{% block title %}{% endblock %} - Baby</title>
+  {% block top_link %}{% endblock %}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{url_for('static', filename='layui/css/layui.css')}}" />
+  <link rel="stylesheet" href="{{url_for('static', filename='app.css')}}" />
+  {% block end_link %}{% endblock %}
+</head>
+<body>
+  <div class="layui-header">
+    <ul class="layui-nav" lay-filter="">
+      <li class="layui-nav-item"><a href="">Baby</a></li>
+      <li class="layui-nav-item"><a href="{{ url_for('blog.index') }}">Posts</a></li>
+      {% if g.user %}
+      <li class="layui-nav-item"><a href="{{ url_for('food.index') }}">Eating</a></li>
+      <li class="layui-nav-item">
+        <a href="javascript:;"><img src="//t.cn/RCzsdCq" class="layui-nav-img">我</a>
+        <dl class="layui-nav-child">
+          <dd><a href="{{url_for('auth.logout')}}">Log Out</a></dd>
+        </dl>
+      </li>
+      {% else %}
+      <li class="layui-nav-item"><a href="{{ url_for('auth.register') }}">Register</a></li>
+      <li class="layui-nav-item"><a href="{{ url_for('auth.login') }}">Log In</a></li>
+      {% endif %}
+    </ul>
+  </div>
+  <section class="content layui-container">
+    <div class="header">
+      <fieldset>
+        <legend><a name='hr'>{% block header %}{% endblock %}</a></legend>
+      </fieldset>
+    </div>
+
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{message}}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </section>
+  <script type="text/javascript" src="{{url_for('static', filename='layui/layui.js')}}"></script>
+  <script type="text/javascript">
+  //注意：导航 依赖 element 模块，否则无法进行功能性操作
+  layui.use('element', function(){
+    var element = layui.element;
+    });
+  </script>
+  {% block script %}{% endblock %}
+</body>

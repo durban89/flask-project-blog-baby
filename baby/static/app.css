@@ -5,15 +5,7 @@
 }
 
 h1 {
-  font-family: serif;
-  color: #377ba8;
   margin: 1rem 0;
-}
-
-
-hr {
-  border: none;
-  border-top: 1px solid lightgray;
 }
 
 nav {
@@ -137,12 +129,13 @@ input[type=submit] {
 .content label.label-nav,
 .content label.label-content {
   width: 60px;
-  background: lightgray;
+  background: #007bff;
   display: flex;
   height: 30px;
   align-items: center;
   justify-content: center;
   margin-bottom: 0;
+  color: #fff
 }
 
 .content label.label-nav.nav {
@@ -167,13 +160,7 @@ input[type=submit] {
 .content select.select-type,
 .content textarea.textarea-body,
 .content textarea.textarea-content {
-  border: 1px solid lightgray;
-  box-shadow: none;
-  height: 35px;
-  font-size: 18px;
-  padding: 0 0.5em;
-  outline: none;
-  width: 910px;
+  border-radius: 0 .25rem .25rem .25rem;
 }
 
 .content select.select-type {
@@ -186,13 +173,12 @@ input[type=submit] {
 .content button.button-submit {
   width: 100px;
   height: 40px;
-  background: lightgray;
   font-size: 14px;
   outline: none;
   box-shadow: none;
+  border-radius: 0;
   border: none;
   font-weight: bold;
-  color: #000000;
 }
 
 .content button.button-submit:active {
@@ -201,7 +187,7 @@ input[type=submit] {
 }
 
 .content button.danger {
-  color: #cc2f2e;
+  color: #fff;
 }
 
 /*select menu*/
@@ -336,7 +322,7 @@ input[type=submit] {
   position: absolute;
   left: 0;
   top: -999px;
-  background: rgba(55, 123, 168, .7);
+  background: rgba(0, 123, 255, .7);
   color: #fff;
   width: 100%;
   text-align: right;

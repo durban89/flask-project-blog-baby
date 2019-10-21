@@ -19,7 +19,7 @@ def index():
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
-    return render_template('blog/index.html', posts=posts)
+    return render_template('blog/index.j2', posts=posts)
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -46,7 +46,7 @@ def create():
             db.commit()
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/create.html')
+    return render_template('blog/create.j2')
 
 
 def get_post(id, check_author=True):
@@ -92,7 +92,7 @@ def update(id):
             db.commit()
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/update.html', post=post)
+    return render_template('blog/update.j2', post=post)
 
 
 @bp.route('/<int:id>/delete', methods=['GET', 'POST'])
@@ -111,4 +111,4 @@ def delete(id):
 def show(id):
     post = get_post(id, False)
 
-    return render_template('blog/show.html', post=post)
+    return render_template('blog/show.j2', post=post)

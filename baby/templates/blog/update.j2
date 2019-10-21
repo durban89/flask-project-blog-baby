@@ -6,26 +6,31 @@
 {% endblock %}
 
 {% block header %}
-  <h1>{% block title %}New Posts{% endblock %}</h1>
+  <h1>{% block title %}Edit "{{ post['title'] }}"{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
   <form method="POST">
     <div class="form-group">
       <label for="title" class="label-title">Title</label>
-      <input id='title' class="form-control" name='title' value="{{ request.form['title'] }}" required/>
+      <input class='form-control input-title' id="title" name="title" value="{{ request.form['title'] or post['title'] }}" required />
     </div>
   
     <div class="form-group">
       <label for="date" class="label-date">Publication date</label>
-      <input class='form-control' id="date" name="date" value="{{ request.form['date'] }}" autocomplete="off" required />
+      <input class='form-control input-date' id="date" name="date" value="{{ request.form['date'] or post['the_date'] }}" autocomplete="off" required />
     </div>
 
     <div class="form-group">
       <label for="body" class="label-body">Body</label>
-      <textarea id='body' name='body' class="textarea-body" value="{{ request.form['body'] }}"></textarea>
+      <textarea name="body" id="body" class="textarea-body">{{ request.form['body'] or post['body'] }}</textarea>
     </div>
-    <button type="submit" class="button-submit">Save</button>
+
+    <button type="submit" class="btn btn-primary button-submit">Save</button>
+  </form>
+  <hr />
+  <form method="POST" action="{{url_for('blog.delete', id=post['id'])}}">
+    <button class="btn btn-danger button-submit danger" type="submit" onclick="return confirm('Are you sure?');">Delete</button>
   </form>
 {% endblock %}
 
@@ -35,13 +40,11 @@
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/module.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/hotkeys.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/simditor.js')}}"></script>
-
 <script type="text/javascript">
 var editor = new Simditor({
   textarea: $('#body')
   //optional options
 });
-
 $( "#date" ).datepicker({
   dateFormat: "yy-mm-dd"
 });

@@ -97,7 +97,7 @@ function addOtherMessage(message, nick, avatar_bg_color) {
   var otherContainer = $('<div class="other-container"></div>');
   var avatarContainer = $('<div><span class="avatar" style="background:'+avatar_bg_color+';border: 1px solid '+avatar_bg_color+'">'+nick+'</span></div>');
   otherContainer.append(avatarContainer);
-  var messageContainer = $('<p></p>');
+  var messageContainer = $('<p style="margin-top: 5px"></p>');
   messageContainer.text(message);
   otherContainer.append(messageContainer);
   chatRoomContainer.append(otherContainer);

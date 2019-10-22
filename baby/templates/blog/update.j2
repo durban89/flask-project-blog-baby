@@ -3,6 +3,7 @@
 {% block top_link %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/simditor/simditor.css')}}" />
 <link rel="stylesheet" href="{{url_for('static', filename='css/jquery-ui.min.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/tagsinput.css')}}" />
 {% endblock %}
 
 {% block header %}
@@ -26,7 +27,14 @@
       <textarea name="body" id="body" class="textarea-body">{{ request.form['body'] or post['body'] }}</textarea>
     </div>
 
-    <button type="submit" class="btn btn-primary button-submit">Save</button>
+    <div class="form-group">
+      <label for='tag' class="label-tag">Tags</label>
+      <input type="text" name="tag" id='tag' data-role="tagsinput" class="form-control input-tag" value="{{ request.form['tag'] or post['tag'] }}" />
+    </div>
+    
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary button-submit">Save</button>
+    </div>
   </form>
   <hr />
   <form method="POST" action="{{url_for('blog.delete', id=post['id'])}}">
@@ -40,6 +48,7 @@
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/module.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/hotkeys.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/simditor/simditor.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/tagsinput.js')}}"></script>
 <script type="text/javascript">
 var editor = new Simditor({
   textarea: $('#body')

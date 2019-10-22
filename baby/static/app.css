@@ -8,32 +8,6 @@ h1 {
   margin: 1rem 0;
 }
 
-nav {
-  background: lightgray;
-  display: flex;
-  align-items: center;
-  padding: 0 0.5rem;
-}
-
-nav h1 {
-  flex: auto;
-  margin: 0;
-}
-
-nav h1 a {
-  text-decoration: none;
-  padding: 0.25rem 0.5rem;
-}
-
-nav ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-nav ul li a,
-nav ul li span,
 header .action {
   display: block;
   padding: 0.5rem;
@@ -124,6 +98,7 @@ input[type=submit] {
 .content label.label-username,
 .content label.label-password,
 .content label.label-date,
+.content label.label-tag,
 .content label.label-body,
 .content label.label-type,
 .content label.label-nav,
@@ -148,7 +123,8 @@ input[type=submit] {
 
 .content label.label-username,
 .content label.label-password,
-.content label.label-content {
+.content label.label-content,
+.content label.label-tag {
   width: 90px;
 }
 
@@ -157,6 +133,7 @@ input[type=submit] {
 .content input.input-password,
 .content input.input-date,
 .content input.input-type,
+.content input.input-tag,
 .content select.select-type,
 .content textarea.textarea-body,
 .content textarea.textarea-content {

@@ -11,7 +11,7 @@ from werkzeug.exceptions import abort
 from baby.auth import login_required
 from baby.db import get_db
 
-bp = Blueprint('blog', __name__)
+bp = Blueprint('blog', __name__, url_prefix='/post')
 
 
 @bp.route('/')

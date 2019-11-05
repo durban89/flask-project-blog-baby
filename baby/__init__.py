@@ -12,6 +12,7 @@ from raven.contrib.flask import Sentry
 from logging.config import dictConfig
 from logging.handlers import SMTPHandler
 from baby.extensions import socketio
+from baby import command
 
 
 def error_handler(e):
@@ -43,12 +44,12 @@ def logging_common_formatter():
 
 def register_mail_handler(app):
     # SMTP Handler
-    if app.config['MAIL_HOST']\
-            and app.config['MAIL_PORT']\
-            and app.config['MAIL_FROM']\
-            and app.config['MAIL_TO']\
-            and app.config['MAIL_USERNAME']\
-            and app.config['MAIL_PASSWORD']:
+    if 'MAIL_HOST' in app.config and app.config['MAIL_HOST']\
+            and 'MAIL_PORT' in app.config and app.config['MAIL_PORT']\
+            and 'MAIL_FROM' in app.config and app.config['MAIL_FROM']\
+            and 'MAIL_TO' in app.config and app.config['MAIL_TO']\
+            and 'MAIL_USERNAME' in app.config and app.config['MAIL_USERNAME']\
+            and 'MAIL_PASSWORD' in app.config and app.config['MAIL_PASSWORD']:
 
         mail_handler = SMTPHandler(
             (
@@ -75,7 +76,7 @@ def register_mail_handler(app):
 
 
 def register_sentry(app):
-    if app.config['SENTRY_DSN']:
+    if 'SENTRY_DSN' in app.config and app.config['SENTRY_DSN']:
         sentry = Sentry(dsn=app.config['SENTRY_DSN'])
         sentry.init_app(app)
 
@@ -109,6 +110,8 @@ def create_app(test_config=None):
         socketio.init_app(app, logger=True, engineio_logger=True)
     else:
         socketio.init_app(app)
+
+    command.init_app(app)
 
     # config logger
     if not app.debug:

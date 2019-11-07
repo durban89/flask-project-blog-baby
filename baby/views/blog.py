@@ -4,7 +4,7 @@ from flask import (
     Blueprint, flash, g, redirect,
     request, render_template,
     url_for,
-    current_app
+    current_app,
 )
 
 from werkzeug.exceptions import abort
@@ -12,7 +12,18 @@ from baby.views.auth import login_required
 from baby.db import get_db
 from baby.exception import InvalidUsage
 
-bp = Blueprint('blog', __name__, url_prefix='/post')
+bp = Blueprint('blog', __name__, url_prefix='/<lang_code>/post')
+
+
+@bp.url_defaults
+def add_language_code(endpoint, values):
+    values.setdefault(
+        'lang_code', g.lang_code if 'lang_code' in g else 'zh')
+
+
+@bp.url_value_preprocessor
+def pull_lang_code(endpoint, values):
+    g.lang_code = values.pop('lang_code')
 
 
 @bp.route('/')
@@ -225,3 +236,8 @@ def tag(name):
 @bp.route('/read', methods=['GET'])
 def read_sum():
     raise InvalidUsage('read sum function developing...', status_code=404)
+
+
+@bp.route('/about', methods=['GET'])
+def language():
+    return g.lang_code + ' 介绍'

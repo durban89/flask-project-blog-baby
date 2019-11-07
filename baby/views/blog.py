@@ -8,8 +8,9 @@ from flask import (
 )
 
 from werkzeug.exceptions import abort
-from baby.auth import login_required
+from baby.views.auth import login_required
 from baby.db import get_db
+from baby.exception import InvalidUsage
 
 bp = Blueprint('blog', __name__, url_prefix='/post')
 
@@ -83,7 +84,7 @@ def create():
 
             cur.executemany(
                 'INSERT INTO tag (post_id, name)'
-                ' VALUES (?,?)', tag_generator(inser_id, tags)
+                ' VALUES (?,?)', tag_generator(insert_id, tags)
             )
 
             db.commit()
@@ -219,3 +220,8 @@ def tag(name):
         posts[n] = o
 
         return render_template('blog/tag.j2', posts=posts)
+
+
+@bp.route('/read', methods=['GET'])
+def read_sum():
+    raise InvalidUsage('read sum function developing...', status_code=404)

@@ -6,17 +6,20 @@ import logging
 from flask import (
     Flask,
     has_request_context,
-    request
+    request,
+    jsonify
 )
 from raven.contrib.flask import Sentry
 from logging.config import dictConfig
 from logging.handlers import SMTPHandler
 from baby.extensions import socketio
 from baby import command
-
-
-def error_handler(e):
-    return 'bad bad bad request!', 400
+from baby import views
+from baby import db
+from baby_backend import application as backend
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.exceptions import BadRequest
+from baby.exception import InvalidUsage
 
 
 def logging_common_formatter():
@@ -102,9 +105,6 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # Error Handler
-    app.register_error_handler(400, error_handler)
-
     # Register Extensions
     if app.debug:
         socketio.init_app(app, logger=True, engineio_logger=True)
@@ -112,6 +112,7 @@ def create_app(test_config=None):
         socketio.init_app(app)
 
     command.init_app(app)
+    views.init_app(app)
 
     # config logger
     if not app.debug:
@@ -136,35 +137,7 @@ def create_app(test_config=None):
             }
         })
 
-    from . import db
     db.init_app(app)
-
-    from . import home
-    app.register_blueprint(home.bp)
-
-    from . import auth
-    app.register_blueprint(auth.bp)
-
-    from . import food
-    app.register_blueprint(food.bp)
-
-    from . import chat
-    app.register_blueprint(chat.bp)
-
-    from . import blog
-    app.register_blueprint(blog.bp)
-
-    from . import api_food
-    app.register_blueprint(api_food.bp)
-
-    from . import api_food_type
-    app.register_blueprint(api_food_type.bp)
-
-    from . import api_food_week
-    app.register_blueprint(api_food_week.bp)
-
-    from . import api_auth
-    app.register_blueprint(api_auth.bp)
 
     if not app.debug:
         # SMTP
@@ -172,10 +145,46 @@ def create_app(test_config=None):
         # Sentry
         register_sentry(app)
 
+    # 整合baby_backend
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+        '/backend': backend
+    })
+
+    @app.errorhandler(BadRequest)
+    def handle_bad_request(e):
+        return 'bad request!', 400
+
+    # 自定义制定状态码的处理逻辑
+    @app.errorhandler(404)
+    def handle_bad_404_request(e):
+        return '404 bad request!', 400
+
+    # 注册自定义异常
+    @app.errorhandler(InvalidUsage)
+    def handle_invalid_usage(e):
+        response = jsonify(e.to_dict())
+        print(response)
+        return response
+
     return app
 
 
+# def make_app_with_prefix(prefix):
+#     # 根据prefix处理
+#     print('======prefix = ' + prefix)
+
+#     if prefix == 'post':
+#         return create_app()
+
+
+# def make_app_with_subdomain(subdomain):
+#     # 根据domain处理
+#     print('=======subdomain = ' + subdomain)
+#     return create_app()
+
+
 application = create_app()
+
 
 if __name__ == "__main__":
     socketio.run(application, debug=application.debug)

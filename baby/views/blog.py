@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-11 11:25:10
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-11 16:18:00
+# @Last Modified time: 2019-11-11 16:28:19
 
 import os
 from flask import (
@@ -232,11 +232,6 @@ def tag(name):
 @bp.route('/read', methods=['GET'])
 def read_sum():
     raise InvalidUsage('read sum function developing...', status_code=404)
-
-
-@bp.route('/about', methods=['GET'])
-def language():
-    return g.lang_code + ' 介绍'
 
 
 def allowed_file(filename):

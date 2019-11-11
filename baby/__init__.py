@@ -9,10 +9,11 @@ from flask import (
     request,
     jsonify
 )
+
 from raven.contrib.flask import Sentry
 from logging.config import dictConfig
 from logging.handlers import SMTPHandler
-from baby.extensions import socketio
+from baby.extensions import socketio, cache
 from baby import command
 from baby import views
 from baby import db
@@ -78,6 +79,14 @@ def register_mail_handler(app):
         logging.info('register mail handler success')
 
 
+def register_cache(app):
+    if 'CACHE_TYPE' in app.config and app.config['CACHE_TYPE']:
+        print('register app cache')
+        cache.init_app(app, config={
+            'CACHE_TYPE': app.config['CACHE_TYPE']
+        })
+
+
 def register_sentry(app):
     if 'SENTRY_DSN' in app.config and app.config['SENTRY_DSN']:
         sentry = Sentry(dsn=app.config['SENTRY_DSN'])
@@ -87,8 +96,6 @@ def register_sentry(app):
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-
-    # if not app.debug:
 
     app.config.from_mapping(
         SECRET_KEY='dev',
@@ -102,6 +109,18 @@ def create_app(test_config=None):
 
     try:
         os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
+    # upload config
+    app.config['UPLOAD_DIR'] = os.path.join(os.getcwd(), 'uploads')
+    app.config['UPLOAD_ALLOWED_EXTENSIONS'] = {
+        'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'
+    }
+    app.config['UPLOAD_MAX_LENGTH'] = 1 * 1024 * 1024  # 1M
+
+    try:
+        os.makedirs(app.config['UPLOAD_DIR'])
     except OSError:
         pass
 
@@ -144,6 +163,9 @@ def create_app(test_config=None):
         register_mail_handler(app)
         # Sentry
         register_sentry(app)
+        # register_cache
+
+    register_cache(app)
 
     # 整合baby_backend
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {

@@ -2,5 +2,8 @@
 
 
 from flask_socketio import SocketIO
+from flask_caching import Cache
 
 socketio = SocketIO(cors_allowed_origins='*')
+
+cache = Cache()

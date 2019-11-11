@@ -1,0 +1,39 @@
+{% extends('base.j2') %}
+
+{% block header %}
+  <h1>{% block title %}Icon{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item active"><a href='{{ url_for("home.index") }}'>Home</a></li>
+    
+    {% if g.user %}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href='{{ url_for("blog.index") }}'>Posts</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Icon</li>
+    {% else %}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href='{{ url_for("blog.index") }}'>Posts</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Icon</li>
+    {% endif %}
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="form">
+      <form method="POST" action="{{ url_for('blog.icon') }}" enctype=multipart/form-data>
+        <div class="form-group">
+          <label class="label-file">Upload icon</label>
+          <input class="form-control file" type="file" name="icon" />
+          <button type="submit" class="btn btn-primary button-submit">上传</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

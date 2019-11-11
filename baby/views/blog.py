@@ -1,29 +1,25 @@
-#! _*_ coding: utf-8 _*_
+# -*- coding: utf-8 -*-
+# @Author: durban.zhang
+# @Date:   2019-11-11 11:25:10
+# @Last Modified by:   durban.zhang
+# @Last Modified time: 2019-11-11 16:18:00
 
+import os
 from flask import (
     Blueprint, flash, g, redirect,
     request, render_template,
     url_for,
     current_app,
+    send_from_directory
 )
 
+from werkzeug import secure_filename
 from werkzeug.exceptions import abort
 from baby.views.auth import login_required
 from baby.db import get_db
 from baby.exception import InvalidUsage
 
-bp = Blueprint('blog', __name__, url_prefix='/<lang_code>/post')
-
-
-@bp.url_defaults
-def add_language_code(endpoint, values):
-    values.setdefault(
-        'lang_code', g.lang_code if 'lang_code' in g else 'zh')
-
-
-@bp.url_value_preprocessor
-def pull_lang_code(endpoint, values):
-    g.lang_code = values.pop('lang_code')
+bp = Blueprint('blog', __name__, url_prefix='/post')
 
 
 @bp.route('/')
@@ -241,3 +237,43 @@ def read_sum():
 @bp.route('/about', methods=['GET'])
 def language():
     return g.lang_code + ' 介绍'
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in current_app.config[
+            'UPLOAD_ALLOWED_EXTENSIONS']
+
+
+def allowed_length(length):
+    return length <= current_app.config[
+        'UPLOAD_MAX_LENGTH']
+
+
+@bp.route('/icon', methods=['GET', 'POST'])
+@login_required
+def icon():
+    if request.method == 'POST':
+        print(request.files)
+        if 'icon' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+
+        file = request.files['icon']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+
+        if file and \
+                allowed_file(file.filename) and \
+                allowed_length(file.content_length):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(current_app.config['UPLOAD_DIR'], filename))
+            return redirect(url_for('blog.uploaded_icon', filename=filename))
+    else:
+        return render_template('blog/icon.j2')
+
+
+@bp.route('/uploaded/icon/<string:filename>', methods=['GET'])
+def uploaded_icon(filename):
+    return send_from_directory(current_app.config['UPLOAD_DIR'], filename)

@@ -116,7 +116,9 @@ input[type=submit] {
 
 .content label.label-title,
 .content label.label-username,
+.content label.label-email,
 .content label.label-password,
+.content label.label-confirm,
 .content label.label-date,
 .content label.label-tag,
 .content label.label-body,
@@ -136,6 +138,9 @@ input[type=submit] {
 .content label.label-nav.nav {
   min-width: 100px
 }
+.content label.label-confirm {
+  width: 150px;
+}
 
 .content label.label-date {
   width: 150px;
@@ -150,7 +155,9 @@ input[type=submit] {
 
 .content input.input-title,
 .content input.input-username,
+.content input.input-email,
 .content input.input-password,
+.content input.input-confirm,
 .content input.input-date,
 .content input.input-type,
 .content input.input-tag,

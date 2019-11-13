@@ -13,7 +13,7 @@ from flask import (
 from raven.contrib.flask import Sentry
 from logging.config import dictConfig
 from logging.handlers import SMTPHandler
-from baby.extensions import socketio, cache
+from baby.extensions import socketio, cache, mongodb
 from baby import command
 from baby import views
 from baby import db
@@ -46,7 +46,7 @@ def logging_common_formatter():
 # 添加mail Handler
 
 
-def register_mail_handler(app):
+def register_mail(app):
     # SMTP Handler
     if 'MAIL_HOST' in app.config and app.config['MAIL_HOST']\
             and 'MAIL_PORT' in app.config and app.config['MAIL_PORT']\
@@ -81,10 +81,13 @@ def register_mail_handler(app):
 
 def register_cache(app):
     if 'CACHE_TYPE' in app.config and app.config['CACHE_TYPE']:
-        print('register app cache')
         cache.init_app(app, config={
             'CACHE_TYPE': app.config['CACHE_TYPE']
         })
+
+
+def register_mongodb(app):
+    mongodb.init_app(app)
 
 
 def register_sentry(app):
@@ -118,6 +121,10 @@ def create_app(test_config=None):
         'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'
     }
     app.config['UPLOAD_MAX_LENGTH'] = 1 * 1024 * 1024  # 1M
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'baby',
+        'alias': 'default'
+    }
 
     try:
         os.makedirs(app.config['UPLOAD_DIR'])
@@ -159,13 +166,11 @@ def create_app(test_config=None):
     db.init_app(app)
 
     if not app.debug:
-        # SMTP
-        register_mail_handler(app)
-        # Sentry
+        register_mail(app)
         register_sentry(app)
-        # register_cache
 
     register_cache(app)
+    register_mongodb(app)
 
     # 整合baby_backend
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {

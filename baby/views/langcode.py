@@ -2,18 +2,34 @@
 # @Author: durban.zhang
 # @Date:   2019-11-11 12:00:49
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-12 11:47:12
+# @Last Modified time: 2019-11-13 10:43:17
 
 from flask import (
     Blueprint,
     g,
-    request
+    request,
+    render_template,
+    flash,
+    url_for,
+    redirect
 )
 from baby.extensions import cache
 from baby.decorator import templated, cached
-
-
+from wtforms import Form, BooleanField, StringField, PasswordField, validators
+from baby.model import Movie, Imdb
 bp = Blueprint('langcode', __name__, url_prefix='/<lang_code>/langcode')
+
+
+class RegisterForm(Form):
+    username = StringField('Username', [validators.Length(min=4, max=25)])
+    email = StringField('Email', [validators.Length(min=4, max=35)])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.Length(min=4, max=25),
+        validators.EqualTo('confirm', message='Password not match')])
+    confirm = PasswordField(
+        'Repeat Password', [validators.Length(min=4, max=25)])
+    accept_tos = BooleanField('I accept the TOS', [validators.DataRequired()])
 
 
 @bp.url_defaults
@@ -53,3 +69,36 @@ def about():
 def contact():
     print('call contact func')
     return g.lang_code + ' Contact'
+
+
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm(request.form)
+    if request.method == 'POST' and form.validate():
+        print(form.username.data)
+        print(form.password.data)
+        print(form.email.data)
+
+        flash('Thanks for register')
+        # return redirect(url_for('langcode.login'))
+        return redirect(request.url)
+    return render_template('langcode/register.j2', form=form)
+
+
+def create_me():
+    bttf = Movie(title='Back To The Feature', year=1985)
+    bttf.actors = [
+        'Michael J. Fox',
+        'Christopher Lloyd'
+    ]
+    bttf.imdb = Imdb(imdb_id='tt0088763', rating=8.5)
+    bttf.save()
+
+    return redirect(url_for('langcode.me'))
+
+
+def me():
+
+    movies = Movie.objects(title='Back To The Feature')
+
+    return render_template('langcode/me.j2', movies=movies)

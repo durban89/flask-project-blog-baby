@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-10-21 13:35:26
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-06 17:17:36
+# @Last Modified time: 2019-11-12 17:41:08
 
 from setuptools import find_packages, setup
 
@@ -15,8 +15,12 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'flask',
-        'flask-socketio',
-        'gunicorn[eventlet]'
+        'Flask==1.1.1',
+        'Flask-SocketIO==4.2.1',
+        'Flask-Caching==1.7.2',
+        'Flask-WTF==0.14.2',
+        'flask-mongoengine==0.9.5',
+        'gunicorn[eventlet]',
+        'raven[flask]'
     ]
 )

@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-06 11:04:15
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-11 12:02:21
+# @Last Modified time: 2019-11-12 17:16:04
 
 from . import (
     home,
@@ -16,6 +16,7 @@ from . import (
     api_food_week,
     api_auth,
 )
+from baby.helper import LazyView
 
 
 def init_app(app):
@@ -29,3 +30,8 @@ def init_app(app):
     app.register_blueprint(api_food_type.bp)
     app.register_blueprint(api_food_week.bp)
     app.register_blueprint(api_auth.bp)
+
+    app.add_url_rule(
+        '/langcode/me',
+        view_func=LazyView('baby.views.langcode.me')
+    )

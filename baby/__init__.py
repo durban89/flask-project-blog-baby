@@ -21,6 +21,7 @@ from baby_backend import application as backend
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.exceptions import BadRequest
 from baby.exception import InvalidUsage
+from baby.middleware import HTTPMethodOverrideMiddleware
 
 
 def logging_common_formatter():
@@ -100,6 +101,9 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
 
+    # middleware
+
+    app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'baby.sqlite')

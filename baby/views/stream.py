@@ -2,7 +2,7 @@
 # @Author: durban
 # @Date:   2019-11-13 11:28:21
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-13 12:05:51
+# @Last Modified time: 2019-11-13 14:48:24
 from flask import (
     current_app,
     request,
@@ -10,6 +10,7 @@ from flask import (
     Response,
     stream_with_context
 )
+from baby.helper import generate_checksum
 
 bp = Blueprint('stream', __name__, url_prefix='/stream')
 
@@ -50,3 +51,12 @@ def large_csv():
             yield ','.join(row) + "\n"
 
     return Response(generate(), mimetype='text/csv')
+
+
+@bp.route('/checksum')
+def checksum():
+    hash = generate_checksum(request)
+
+    checksum = hash.hexdigest()
+
+    return 'Hash was: %s' % checksum

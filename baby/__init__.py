@@ -58,6 +58,9 @@ def create_app(test_config=None):
         'alias': 'default'
     }
 
+    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+    app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+
     try:
         os.makedirs(app.config['UPLOAD_DIR'])
     except OSError:
@@ -68,9 +71,6 @@ def create_app(test_config=None):
         socketio.init_app(app, logger=True, engineio_logger=True)
     else:
         socketio.init_app(app)
-
-    command.init_app(app)
-    views.init_app(app)
 
     # config logger
     if not app.debug:
@@ -95,6 +95,8 @@ def create_app(test_config=None):
             }
         })
 
+    command.init_app(app)
+    views.init_app(app)
     db.init_app(app)
 
     if not app.debug:
@@ -128,22 +130,7 @@ def create_app(test_config=None):
     return app
 
 
-# def make_app_with_prefix(prefix):
-#     # 根据prefix处理
-#     print('======prefix = ' + prefix)
-
-#     if prefix == 'post':
-#         return create_app()
-
-
-# def make_app_with_subdomain(subdomain):
-#     # 根据domain处理
-#     print('=======subdomain = ' + subdomain)
-#     return create_app()
-
-
 application = create_app()
-
 
 if __name__ == "__main__":
     socketio.run(application, debug=application.debug)

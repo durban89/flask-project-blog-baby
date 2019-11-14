@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-10-21 13:35:26
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-12 17:41:08
+# @Last Modified time: 2019-11-13 15:44:14
 
 from setuptools import find_packages, setup
 
@@ -21,6 +21,8 @@ setup(
         'Flask-WTF==0.14.2',
         'flask-mongoengine==0.9.5',
         'gunicorn[eventlet]',
-        'raven[flask]'
+        'raven[flask]',
+        'celery==4.3.0',
+        'redis==3.3.11'
     ]
 )

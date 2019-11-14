@@ -2,7 +2,7 @@
 # @Author: durban
 # @Date:   2019-11-13 11:28:21
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-13 14:48:24
+# @Last Modified time: 2019-11-13 17:52:13
 from flask import (
     current_app,
     request,
@@ -11,6 +11,7 @@ from flask import (
     stream_with_context
 )
 from baby.helper import generate_checksum
+from baby.celery import create_celery
 
 bp = Blueprint('stream', __name__, url_prefix='/stream')
 
@@ -60,3 +61,11 @@ def checksum():
     checksum = hash.hexdigest()
 
     return 'Hash was: %s' % checksum
+
+
+@bp.route('/together')
+def together():
+    celery = create_celery(current_app)
+    result = celery.send_task(name='tasks.add_together', args=(2, 3))
+    print(result.wait())
+    return 'success'

@@ -16,6 +16,18 @@
     <input type="password" class="form-control input-password" name="password"" id="password" required/>
   </div>
 
+  <div class=form-group>
+    <label for="verification-code" class="label-verification-code">Verification code</label>
+    <div class='input-group'>
+      <input type="text" class="form-control input-verification-code" id="verification-code" name="verification-code" required />
+      <div class="input-group-append">
+        <span id='captcha'>
+          <img src='{{url_for('home.captcha')}}' alt='verification code' style='height:calc(1.5em + .75rem + 2px)'/>
+        </span>
+      </div>
+    </div>
+  </div>
+  
   <button type="submit" class="btn btn-primary button-submit">Register</button>
 </form>
 {% endblock %}

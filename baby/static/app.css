@@ -121,6 +121,7 @@ input[type=submit] {
 .content label.label-confirm,
 .content label.label-date,
 .content label.label-tag,
+.content label.label-verification-code,
 .content label.label-body,
 .content label.label-type,
 .content label.label-nav,
@@ -146,6 +147,10 @@ input[type=submit] {
   width: 150px;
 }
 
+.content label.label-verification-code {
+  width: 150px;
+}
+
 .content label.label-username,
 .content label.label-password,
 .content label.label-content,
@@ -157,6 +162,7 @@ input[type=submit] {
 .content input.input-username,
 .content input.input-email,
 .content input.input-password,
+.content input.input-verification-code,
 .content input.input-confirm,
 .content input.input-date,
 .content input.input-type,

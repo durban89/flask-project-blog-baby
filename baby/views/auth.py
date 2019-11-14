@@ -11,12 +11,12 @@ from flask import (
     request,
     session,
     url_for,
-    jsonify,
     current_app
 )
 
 from werkzeug.security import check_password_hash, generate_password_hash
 from baby.db import get_db
+from baby.helper.captcha import Captcha
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -38,6 +38,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        code = request.form['verification-code']
         db = get_db()
         error = None
 
@@ -45,6 +46,10 @@ def register():
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
+        elif not code:
+            error = 'Verification code is required'
+        elif code and not Captcha.captcha_validate(code):
+            error = 'Verification code is wrong'
         elif db.execute(
             'SELECT id FROM user WHERE username = ?', (username,)
         ).fetchone() is not None:
@@ -68,6 +73,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        code = request.form['verification-code']
 
         db = get_db()
         error = None
@@ -84,6 +90,10 @@ def login():
             current_app.logger.error(
                 '%s logged fail - password is wrong', username)
             error = 'Incorrect password.'
+        elif not code:
+            error = 'Verification code is required'
+        elif code and not Captcha.captcha_validate(code):
+            error = 'Verification code is wrong'
 
         if error is None:
             session.clear()

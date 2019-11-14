@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-10-21 13:35:26
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-13 15:44:14
+# @Last Modified time: 2019-11-14 14:12:39
 
 from setuptools import find_packages, setup
 
@@ -19,6 +19,7 @@ setup(
         'Flask-SocketIO==4.2.1',
         'Flask-Caching==1.7.2',
         'Flask-WTF==0.14.2',
+        'Pillow==6.2.1',
         'flask-mongoengine==0.9.5',
         'gunicorn[eventlet]',
         'raven[flask]',

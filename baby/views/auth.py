@@ -17,6 +17,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from baby.db import get_db
 from baby.helper.captcha import Captcha
+from baby.celery import create_celery
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -99,6 +100,13 @@ def login():
             session.clear()
             session['user_id'] = user['id']
             logging.info('%s logged successfully', username)
+
+            celery = create_celery(current_app)
+            celery.send_task(
+                name='tasks.send_login_email',
+                args=[user['username'], 'zhangdapeng89@126.com']
+            )
+
             return redirect(url_for('blog.index'))
 
         flash(error)

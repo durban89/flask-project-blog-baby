@@ -16,7 +16,7 @@ from flask import (
     url_for
 )
 from baby.db import get_db
-from baby.auth import login_required
+from baby.views.auth import login_required
 
 bp = Blueprint('food', __name__, url_prefix='/food')
 

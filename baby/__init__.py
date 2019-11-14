@@ -1,91 +1,37 @@
 #! _*_ coding: utf-8 _*_
 
 import os
-import logging
 
 from flask import (
     Flask,
-    has_request_context,
-    request
+    jsonify
 )
-from raven.contrib.flask import Sentry
+
 from logging.config import dictConfig
-from logging.handlers import SMTPHandler
 from baby.extensions import socketio
-
-
-def error_handler(e):
-    return 'bad bad bad request!', 400
-
-
-def logging_common_formatter():
-    class RequestFormatter(logging.Formatter):
-
-        def format(self, record):
-            if has_request_context():
-                record.url = request.url
-                record.remote_addr = request.remote_addr
-            else:
-                record.url = None
-                record.remote_addr = None
-
-            return super().format(record)
-
-    formatter = RequestFormatter(
-        '[%(asctime)s] %(remote_addr)s requested %(url)s\n'
-        '%(levelname)s in %(module)s: %(message)s'
-    )
-
-    return formatter
-
-# 添加mail Handler
-
-
-def register_mail_handler(app):
-    # SMTP Handler
-    if app.config['MAIL_HOST']\
-            and app.config['MAIL_PORT']\
-            and app.config['MAIL_FROM']\
-            and app.config['MAIL_TO']\
-            and app.config['MAIL_USERNAME']\
-            and app.config['MAIL_PASSWORD']:
-
-        mail_handler = SMTPHandler(
-            (
-                app.config['MAIL_HOST'],
-                app.config['MAIL_PORT'],
-            ),
-            app.config['MAIL_FROM'],
-            app.config['MAIL_TO'],
-            'Application Error',
-            (
-                app.config['MAIL_USERNAME'],
-                app.config['MAIL_PASSWORD'],
-            )
-        )
-
-        mail_handler.setLevel(logging.ERROR)
-        formatter = logging_common_formatter()
-
-        mail_handler.setFormatter(formatter)
-
-        app.logger.addHandler(mail_handler)
-
-        logging.info('register mail handler success')
-
-
-def register_sentry(app):
-    if app.config['SENTRY_DSN']:
-        sentry = Sentry(dsn=app.config['SENTRY_DSN'])
-        sentry.init_app(app)
+from baby import command
+from baby import views
+from baby import db
+from baby_backend import application as backend
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.exceptions import BadRequest
+from baby.exception import InvalidUsage
+from baby.middleware import HTTPMethodOverrideMiddleware
+from baby.helper import (
+    register_cache,
+    register_mail,
+    register_mongodb,
+    register_sentry
+)
 
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
 
-    # if not app.debug:
+    # middleware
 
+    app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'baby.sqlite')
@@ -101,8 +47,24 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # Error Handler
-    app.register_error_handler(400, error_handler)
+    # upload config
+    app.config['UPLOAD_DIR'] = os.path.join(os.getcwd(), 'uploads')
+    app.config['UPLOAD_ALLOWED_EXTENSIONS'] = {
+        'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'
+    }
+    app.config['UPLOAD_MAX_LENGTH'] = 1 * 1024 * 1024  # 1M
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'baby',
+        'alias': 'default'
+    }
+
+    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+    app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+
+    try:
+        os.makedirs(app.config['UPLOAD_DIR'])
+    except OSError:
+        pass
 
     # Register Extensions
     if app.debug:
@@ -133,43 +95,37 @@ def create_app(test_config=None):
             }
         })
 
-    @app.route('/baby')
-    def index():
-        return 'Baby'
-
-    from . import db
+    command.init_app(app)
+    views.init_app(app)
     db.init_app(app)
 
-    from . import auth
-    app.register_blueprint(auth.bp)
-
-    from . import food
-    app.register_blueprint(food.bp)
-
-    from . import chat
-    app.register_blueprint(chat.bp)
-
-    from . import api_food
-    app.register_blueprint(api_food.bp)
-
-    from . import api_food_type
-    app.register_blueprint(api_food_type.bp)
-
-    from . import api_food_week
-    app.register_blueprint(api_food_week.bp)
-
-    from . import blog
-    app.register_blueprint(blog.bp)
-    app.add_url_rule('/', endpoint='index')
-
-    from . import api_auth
-    app.register_blueprint(api_auth.bp)
-
     if not app.debug:
-        # SMTP
-        register_mail_handler(app)
-        # Sentry
+        register_mail(app)
         register_sentry(app)
+
+    register_cache(app)
+    register_mongodb(app)
+
+    # 整合baby_backend
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+        '/backend': backend
+    })
+
+    @app.errorhandler(BadRequest)
+    def handle_bad_request(e):
+        return 'bad request!', 400
+
+    # 自定义制定状态码的处理逻辑
+    @app.errorhandler(404)
+    def handle_bad_404_request(e):
+        return '404 bad request!', 400
+
+    # 注册自定义异常
+    @app.errorhandler(InvalidUsage)
+    def handle_invalid_usage(e):
+        response = jsonify(e.to_dict())
+        print(response)
+        return response
 
     return app
 

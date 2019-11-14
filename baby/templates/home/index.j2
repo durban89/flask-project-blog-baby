@@ -1,0 +1,28 @@
+{% extends 'base.j2' %}
+
+{% block header %}
+<h1>
+{% block title %}
+Home
+{% endblock %}
+</h1>
+{% endblock %}
+
+{% block content %}
+<section class="row">
+  <div class="col-md-6">
+    <div class="home-main-pic">
+      <img src="{{url_for('static', filename='images/posts.jpeg')}}" style="width: 100%; overflow: hidden" />
+    </div>
+    <div class="home-main-desc"><a href='{{ url_for("blog.index")}}' target='_blank'>帖子相关</a></div>
+  </div>
+  {% if g.user %}
+  <div class="col-md-6">
+    <div class="home-main-pic">
+      <img src="{{url_for('static', filename='images/foods.jpeg')}}" style="width: 100%; overflow: hidden" />
+    </div>
+    <div class="home-main-desc"><a href='{{ url_for("food.index")}}' target='_blank'>饮食相关</a></div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.j2" %}
+
+{% block content %}
+  {% for movie in movies %}
+    <p>{{ movie.id }}</p>
+    <p>{{ movie.title }}</p>
+    <p>{{ movie.year }}</p>
+    <p>{{ movie.imdb.rating }}</p>
+  {% endfor %}
+{% endblock %}

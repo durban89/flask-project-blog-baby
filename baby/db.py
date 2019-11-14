@@ -44,6 +44,10 @@ def init_db_command():
 @with_appcontext
 def execute_db_sql(sql):
     '''Execute db sql'''
+    if not sql:
+        click.echo('Empty SQL')
+        return
+
     db = get_db()
 
     db.execute(sql)

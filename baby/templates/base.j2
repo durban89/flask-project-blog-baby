@@ -3,13 +3,19 @@
   <title>{% block title %}{% endblock %} - Baby</title>
   {% block top_link %}{% endblock %}
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{url_for('static', filename='apple-touch-icon.png')}}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{url_for('static', filename='favicon-32x32.png')}}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{url_for('static', filename='favicon-16x16.png')}}">
+  <link rel="manifest" href="{{url_for('static', filename='site.webmanifest')}}">
   <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}" />
   <link rel="stylesheet" href="{{url_for('static', filename='app.css')}}" />
   {% block end_link %}{% endblock %}
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a class="navbar-brand" href="#">Baby</a>
+    <a class="navbar-brand" href="{{ url_for('home.index') }}">
+      <image src='{{url_for('static', filename='logo.png')}}' alt='Baby' style='height:20px' />
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>

@@ -13,3 +13,4 @@ build/
 instance/
 gunicorn.conf
 .env*
+uploads

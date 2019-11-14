@@ -23,4 +23,4 @@ if __name__ == '__main__':
     #     make_app_with_prefix
     # )
 
-    socketio.run(application, port=8082, debug=True)
+    socketio.run(application, debug=True)

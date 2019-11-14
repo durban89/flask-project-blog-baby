@@ -8,7 +8,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='baby',
-    version='1.0.6',
+    version='1.0.7',
     author='张大鹏',
     author_email='durban.zhang@gmail.com',
     packages=find_packages(),

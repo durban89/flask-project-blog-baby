@@ -1,6 +1,11 @@
 #! _*_ coding: utf-8 _*_
 import functools
 import logging
+import time
+import re
+from os import urandom
+from datetime import timedelta
+from base64 import urlsafe_b64encode
 
 from flask import (
     Blueprint,
@@ -39,14 +44,27 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
         code = request.form['verification-code']
         db = get_db()
         error = None
 
         if not username:
             error = 'Username is required.'
+        elif username and registered_username(username):
+            error = 'Username has been registered.'
+        elif username and not check_username_safe(username):
+            error = 'Username is invalidate.'
         elif not password:
             error = 'Password is required.'
+        elif password and not check_password_safe(password):
+            error = 'Password is not safety.'
+        elif not email:
+            error = 'Email is required.'
+        elif email and registered_email(email):
+            error = 'Email has been registered.'
+        elif email and not check_email_safe(email):
+            error = 'Email address is invalidate.'
         elif not code:
             error = 'Verification code is required'
         elif code and not Captcha.captcha_validate(code):
@@ -56,17 +74,94 @@ def register():
         ).fetchone() is not None:
             error = 'user {} is already registered.'.format(username)
 
+        ctime = int(time.time())
         if error is None:
             db.execute(
-                'INSERT INTO user (username, password) VALUES (?, ?)',
-                (username, generate_password_hash(password))
+                'INSERT INTO user (username, email, password, ctime) '
+                'VALUES (?, ?, ?, ?)',
+                (username, email, generate_password_hash(password), ctime)
             )
             db.commit()
-            return redirect(url_for('auth.login'))
+
+            send_register_email(username, email)
+
+            return render_template(
+                'auth/register_success.j2',
+                email=email
+            )
+            # return redirect(url_for('auth.login'))
 
         flash(error)
 
     return render_template('auth/register.j2')
+
+
+def check_username_safe(username):
+    length_error = len(username) < 3
+
+    username_error = re.search(r'[a-zA-Z]', username) is None
+
+    return not (length_error or username_error)
+
+
+def check_email_safe(email):
+    email_error = re.search(
+        r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)', email) is None
+
+    return not email_error
+
+
+def check_password_safe(password):
+    # 长度 至少8位
+    length_error = len(password) < 8
+
+    digit_error = re.search(r"\d", password) is None
+
+    # searching for uppercase
+    uppercase_error = re.search(r"[A-Z]", password) is None
+
+    # searching for lowercase
+    lowercase_error = re.search(r"[a-z]", password) is None
+
+    # searching for symbols
+    symbol_error = re.search(
+        r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]', password) is None
+
+    ok = not (
+        length_error or
+        digit_error or
+        uppercase_error or
+        lowercase_error or
+        symbol_error
+    )
+
+    return ok
+
+
+def registered_username(username):
+    db = get_db()
+    row = db.execute(
+        'SELECT * FROM user WHERE username = ? and username <> ""',
+        (username,)
+    ).fetchone()
+
+    if row is None:
+        return False
+    else:
+        return True
+
+
+def registered_email(email):
+    db = get_db()
+    row = db.execute(
+        'SELECT * FROM user WHERE email = ? and email <> ""',
+        (email,)
+    ).fetchone()
+
+    if row is None:
+        return False
+    else:
+        return True
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -80,7 +175,10 @@ def login():
         error = None
 
         user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
+            'SELECT * FROM user '
+            ' WHERE (username = ? OR email = ?)'
+            ' AND email <> "" and status = 1',
+            (username, username)
         ).fetchone()
 
         if user is None:
@@ -118,6 +216,74 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('blog.index'))
+
+
+@bp.route('/register/activate')
+def register_activate():
+    code = request.args.get('code')
+
+    db = get_db()
+    row = db.execute(
+        'SELECT * FROM user_email_verify WHERE code=?',
+        (code,)
+    ).fetchone()
+
+    print(code)
+
+    print(row)
+
+    if row is None:
+        return render_template(
+            'auth/email_verify_erorr.j2',
+            msg='验证失败'
+        )
+    else:
+        row = dict(row)
+        ctime = int(time.time())
+        if ctime > row['expired']:
+            return render_template(
+                'auth/email_verify_erorr.j2',
+                msg='验证链接已过期'
+            )
+
+        db.execute(
+            'UPDATE user SET status=1 WHERE email=?',
+            (row['email'],)
+        )
+        db.execute(
+            'UPDATE user_email_verify SET expired=0 WHERE id=?',
+            (row['id'],)
+        )
+        db.commit()
+
+        return redirect(url_for('auth.login'))
+
+
+def send_register_email(username, email):
+    db = get_db()
+    code = urlsafe_b64encode(urandom(64)).decode('utf-8')
+
+    # 过期时间30分钟
+    delta = timedelta(minutes=30)
+    ctime = int(time.time())
+    expired = ctime + delta.seconds
+
+    db.execute(
+        'INSERT INTO user_email_verify'
+        ' (email, code, expired, ctime) VALUES (?,?,?,?)',
+        (email, code, expired, ctime)
+    )
+    db.commit()
+
+    celery = create_celery(current_app)
+    celery.send_task(name='tasks.send_register_email',
+                     args=[
+                         username,
+                         email,
+                         code
+                     ])
+
+    return 'test'
 
 
 def login_required(view):

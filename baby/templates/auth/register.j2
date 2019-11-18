@@ -16,6 +16,11 @@
     <input type="password" class="form-control input-password" name="password"" id="password" required/>
   </div>
 
+  <div class="form-group">
+    <label for="email" class="label-email">Email</label>
+    <input type="email" class="form-control input-email" name="email"" id="email" required/>
+  </div>
+
   <div class=form-group>
     <label for="verification-code" class="label-verification-code">Verification code</label>
     <div class='input-group'>
@@ -30,4 +35,17 @@
   
   <button type="submit" class="btn btn-primary button-submit">Register</button>
 </form>
+{% endblock %}
+
+{% block script %}
+<script>
+$(function(){
+  $('#captcha').bind('click', function(){
+    var img = $(this).find('img');
+    var src = img.attr('src');
+    src = src.split('?')[0]+'?t='+new Date().valueOf();
+    img.attr('src', src);
+  })  
+})
+</script>
 {% endblock %}

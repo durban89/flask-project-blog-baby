@@ -65,8 +65,11 @@ def create_app(test_config=None):
     app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
 
     # flask-mail config
-    app.config['MAIL_SERVER'] = app.config['MAIL_HOST']
-    app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_FROM']
+    if 'MAIL_HOST' in app.config:
+        app.config['MAIL_SERVER'] = app.config['MAIL_HOST']
+
+    if 'MAIL_FROM' in app.config:
+        app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_FROM']
 
     try:
         os.makedirs(app.config['UPLOAD_DIR'])

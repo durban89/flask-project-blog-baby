@@ -5,6 +5,6 @@ VALUES
     ('other', 'pbkdf2:sha256:50000$kJPKsz6N$d2d4784f1b030a9761f5ccaeeaca413f27f2ecb76d6168407af962ddce849f79');
 
 INSERT INTO post
-    (title, body, author_id, created)
+    (title, body, the_date, author_id, created)
 VALUES
-    ('test title', 'test' || x'0a' || 'body', 1, '2018-01-01 00:00:00');
+    ('test title', 'test' || x'0a' || 'body', '2018-01-01', 1, '2018-01-01 00:00:00');

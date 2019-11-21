@@ -23,6 +23,15 @@
     </div>
 
     <div class="form-group">
+      <label for="category-id" class="label-category">Category</label>
+      <select class='form-control select-category' id="category_id" name="category_id" autocomplete="off" required>
+        {% for c in category %}
+        <option value='{{c.id}}'>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
       <label for="body" class="label-body">Body</label>
       <textarea id='body' name='body' class="textarea-body">{{ request.form['body'] }}</textarea>
     </div>

@@ -121,6 +121,7 @@ input[type=submit] {
 .content label.label-confirm,
 .content label.label-date,
 .content label.label-tag,
+.content label.label-category,
 .content label.label-verification-code,
 .content label.label-body,
 .content label.label-type,
@@ -147,6 +148,10 @@ input[type=submit] {
   width: 150px;
 }
 
+.content label.label-category {
+  width: 90px;
+}
+
 .content label.label-verification-code {
   width: 150px;
 }
@@ -167,10 +172,16 @@ input[type=submit] {
 .content input.input-date,
 .content input.input-type,
 .content input.input-tag,
+.content select.select-category,
 .content select.select-type,
 .content textarea.textarea-body,
 .content textarea.textarea-content {
   border-radius: 0 .25rem .25rem .25rem;
+}
+
+.content select.select-category {
+  -webkit-appearance: none;
+  -webkit-border-radius: 0 .25rem .25rem .25rem;
 }
 
 .content select.select-type {

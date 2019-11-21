@@ -124,18 +124,20 @@ def create_app(test_config=None):
 
     @app.errorhandler(BadRequest)
     def handle_bad_request(e):
+        app.logger.error(e)
         return 'bad request!', 400
 
     # 自定义制定状态码的处理逻辑
     @app.errorhandler(404)
     def handle_bad_404_request(e):
+        app.logger.error(e)
         return '404 bad request!', 400
 
     # 注册自定义异常
     @app.errorhandler(InvalidUsage)
     def handle_invalid_usage(e):
+        app.logger.error(e)
         response = jsonify(e.to_dict())
-        print(response)
         return response
 
     return app

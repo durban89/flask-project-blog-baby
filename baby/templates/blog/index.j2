@@ -32,7 +32,7 @@
   <header>
     <div>
       <h1><a href="{{url_for('blog.show', id=post['id'])}}">{{ post['title'] }}</a></h1>
-      <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }} on <a target="__blank" href=''>aaa</a></div>
+      <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }} on <a target="__blank" href=''>{{ post['category_name'] }}</a></div>
     </div>
 
     {% if g.user['id'] == post['author_id'] %}

@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-11 11:25:10
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-11 16:28:19
+# @Last Modified time: 2019-11-21 12:13:44
 
 import os
 from flask import (
@@ -30,9 +30,13 @@ def index():
 
     db = get_db()
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
+        'SELECT p.id, pc.category_id, c.name AS category_name,'
+        ' p.title, p.body, p.created, p.author_id, u.username'
+        ' FROM post p'
+        ' JOIN user u ON p.author_id = u.id'
+        ' JOIN post_category pc ON pc.post_id = p.id'
+        ' JOIN category c ON c.id = pc.category_id'
+        ' ORDER BY p.created DESC'
         ' LIMIT ?, ?', ((page - 1) * pagesize, pagesize)
     ).fetchall()
 
@@ -64,10 +68,15 @@ def create():
         body = request.form['body']
         date = request.form['date']
         tag = request.form['tag']
+        category_id = request.form[
+            'category_id'] if 'category_id' in request.form else ''
         error = None
 
         if not title:
             error = 'Title is required'
+
+        if not category_id:
+            error = 'Category is required'
 
         if not tag:
             error = 'Tag is required'
@@ -87,6 +96,7 @@ def create():
 
             db.commit()
 
+            # tag insert
             insert_id = cur.lastrowid
 
             cur.executemany(
@@ -96,9 +106,23 @@ def create():
 
             db.commit()
 
+            # category insert
+            cur.execute(
+                'INSERT INTO post_category (post_id, category_id)'
+                ' VALUES (?,?)',
+                (insert_id, category_id)
+            )
+
+            db.commit()
+
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/create.j2')
+    category = get_category()
+
+    return render_template(
+        'blog/create.j2',
+        category=category
+    )
 
 
 def tag_generator(insert_id, tags):
@@ -106,12 +130,22 @@ def tag_generator(insert_id, tags):
         yield (insert_id, c)
 
 
+def get_category():
+    db = get_db()
+    category = db.execute('SELECT * FROM category ORDER BY id DESC').fetchall()
+
+    return category
+
+
 def get_post(id, check_author=True):
     db = get_db()
 
     post = db.execute(
-        'SELECT p.id, the_date, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
+        'SELECT p.id, pc.category_id,'
+        ' the_date, title, body, p.created, author_id, username'
+        ' FROM post p'
+        ' JOIN user u ON p.author_id = u.id'
+        ' JOIN post_category pc ON pc.post_id = p.id'
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
@@ -143,10 +177,14 @@ def update(id):
         body = request.form['body']
         date = request.form['date']
         tag = request.form['tag']
+        category_id = request.form['category_id']
         error = None
 
         if not title:
             error = 'Title is required'
+
+        if not category_id:
+            error = 'Category is request'
 
         if not tag:
             error = 'Tag is required'
@@ -179,11 +217,22 @@ def update(id):
                 ' VALUES (?,?)', tag_generator(id, tags)
             )
 
+            cur.execute(
+                'UPDATE post_category SET category_id = ?'
+                ' WHERE post_id = ?',
+                (category_id, id,))
+
             db.commit()
 
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/update.j2', post=post)
+    category = get_category()
+
+    return render_template(
+        'blog/update.j2',
+        post=post,
+        category=category
+    )
 
 
 @bp.route('/<int:id>/delete', methods=['GET', 'POST'])

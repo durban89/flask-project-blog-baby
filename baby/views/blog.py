@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-11 11:25:10
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-21 12:13:44
+# @Last Modified time: 2019-11-21 14:01:23
 
 import os
 from flask import (
@@ -22,12 +22,7 @@ from baby.exception import InvalidUsage
 bp = Blueprint('blog', __name__, url_prefix='/post')
 
 
-@bp.route('/')
-def index():
-    page = request.args.get('page', 1, type=int)
-    page = int(page)
-    pagesize = 5
-
+def get_posts(page, pagesize):
     db = get_db()
     posts = db.execute(
         'SELECT p.id, pc.category_id, c.name AS category_name,'
@@ -52,12 +47,43 @@ def index():
     prev_page = (page - 1) if (page - 1) else ''
     next_page = (page + 1) if len(posts) >= pagesize else ''
 
-    return render_template('blog/index.j2',
-                           posts=posts,
-                           page=page,
-                           prev_page=prev_page,
-                           next_page=next_page,
-                           pagesize=pagesize)
+    return posts, page, prev_page, next_page, pagesize
+
+
+@bp.route('/item')
+def index_item():
+    page = request.args.get('page', 1, type=int)
+    page = int(page)
+    pagesize = 5
+
+    posts, page, prev_page, next_page, pagesize = get_posts(page, pagesize)
+
+    return render_template(
+        'blog/index_item.j2',
+        posts=posts,
+        page=page,
+        prev_page=prev_page,
+        next_page=next_page,
+        pagesize=pagesize
+    )
+
+
+@bp.route('/')
+def index():
+    page = request.args.get('page', 1, type=int)
+    page = int(page)
+    pagesize = 5
+
+    posts, page, prev_page, next_page, pagesize = get_posts(page, pagesize)
+
+    return render_template(
+        'blog/index.j2',
+        posts=posts,
+        page=page,
+        prev_page=prev_page,
+        next_page=next_page,
+        pagesize=pagesize
+    )
 
 
 @bp.route('/create', methods=['GET', 'POST'])

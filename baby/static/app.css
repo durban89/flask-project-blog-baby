@@ -125,6 +125,8 @@ input[type=submit] {
 .content label.label-verification-code,
 .content label.label-body,
 .content label.label-type,
+.content label.label-find-password,
+.content label.label-reset-password,
 .content label.label-nav,
 .content label.label-content {
   width: 60px;
@@ -140,8 +142,17 @@ input[type=submit] {
 .content label.label-nav.nav {
   min-width: 100px
 }
+
+.content label.label-reset-password {
+  width: 200px;
+}
+
 .content label.label-confirm {
   width: 150px;
+}
+
+.content label.label-find-password {
+  width: 250px; 
 }
 
 .content label.label-date {

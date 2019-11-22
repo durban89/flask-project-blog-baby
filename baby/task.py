@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-13 16:30:07
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-21 14:24:00
+# @Last Modified time: 2019-11-22 17:29:42
 from flask_mail import Message
 from baby.extensions import mail
 from baby import create_app
@@ -37,7 +37,7 @@ def find_pass_email(email, code):
     html = '''
 <html>
 <body>
-<p>Hi %s,</p>
+<p>Hi,</p>
 <p style='padding-top: 10px;
     font-family: Helvetica,Helvetica neue,Arial,Verdana,sans-serif;
     color: #333333;
@@ -69,7 +69,9 @@ Or copy this link <b>%s</b> to reset your password.
 </body>
 </html>
 '''
-    link = 'https://www.walkerfree.com/auth/register/activate?code=%s' % (code)
+    link = 'https://www.walkerfree.com/auth/find/password/activate?code=%s'
+    link = link % (
+        code)
 
     with mail.connect() as conn:
 

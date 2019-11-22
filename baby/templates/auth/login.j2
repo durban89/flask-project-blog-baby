@@ -28,7 +28,11 @@
     </div>
   </div>
   
-  <button type="submit" class="btn btn-primary button-submit">Login In</button>
+  <div>
+    <button type="submit" class="btn btn-primary button-submit">Login In</button>
+    <a href="{{url_for('auth.find_password')}}">forget password?</a>
+  </div>
+
 </form>
 {% endblock %}
 

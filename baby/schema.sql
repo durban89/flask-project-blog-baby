@@ -13,6 +13,15 @@ CREATE TABLE user_email_verify (
     ctime INTEGER NOT NULL
 );
 
+CREATE TABLE find_password_verify (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email VARCHAR(255) NOT NULL,
+    code VARCHAR(255) NOT NULL,
+    expired INTEGER NOT NULL,
+    ctime INTEGER NOT NULL
+);
+
+
 CREATE TABLE category (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,

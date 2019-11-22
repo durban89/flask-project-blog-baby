@@ -218,6 +218,109 @@ def logout():
     return redirect(url_for('blog.index'))
 
 
+@bp.route('/find/password/activate', methods=['GET', 'POST'])
+def find_password_activate():
+    '''找回密码激活'''
+    if request.method == 'POST':
+        password = request.form['password']
+        code = request.args.get('code')
+
+        db = get_db()
+
+        row = db.execute(
+            'SELECT * FROM find_password_verify WHERE code = ?',
+            (code,)
+        ).fetchone()
+
+        if row is None:
+            flash('验证失败')
+        else:
+            row = dict(row)
+            ctime = int(time.time())
+            if ctime > row['expired']:
+                flash('链接已过期，请重新提交')
+            else:
+                db.execute(
+                    'UPDATE user SET password=? WHERE email = ?',
+                    (generate_password_hash(password), row['email'])
+                )
+                db.execute(
+                    'UPDATE find_password_verify SET expired = 0 WHERE id = ?',
+                    (row['id'],)
+                )
+                db.commit()
+
+                flash('密码设置成功', 'success')
+
+    return render_template('auth/find_password_activate.j2')
+
+
+def check_find_password_email_is_expired(row, ctime):
+    '''检查发送重置密码的邮件是否过期'''
+    row = dict(row)
+
+    if row and row['expired'] > ctime:
+        return False
+
+    return True
+
+
+@bp.route('/find/password', methods=['GET', 'POST'])
+def find_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        if email is None:
+            flash('Email address is empty', 'warning')
+        elif email and not check_email_safe(email):
+            flash('Email address is invalidate', 'warning')
+        else:
+            db = get_db()
+            row = db.execute(
+                'SELECT * FROM user WHERE email = ?',
+                (email,)
+            ).fetchone()
+
+            if row is None:
+                flash('Email is not registered', 'warning')
+            else:
+                row = db.execute(
+                    'SELECT * FROM find_password_verify WHERE email = ?'
+                    ' ORDER BY id DESC',
+                    (email,)
+                ).fetchone()
+
+                ctime = int(time.time())
+
+                if row and \
+                        not check_find_password_email_is_expired(row, ctime):
+                    flash('so quickly, please slowly', 'warning')
+                else:
+                    code = urlsafe_b64encode(urandom(64)).decode('utf-8')
+
+                    # 过期时间30分钟
+                    delta = timedelta(minutes=30)
+
+                    expired = ctime + delta.seconds
+
+                    db.execute(
+                        'INSERT INTO find_password_verify'
+                        ' (email, code, expired, ctime) VALUES (?,?,?,?)',
+                        (email, code, expired, ctime)
+                    )
+                    db.commit()
+
+                    celery = create_celery(current_app)
+                    celery.send_task(
+                        name='tasks.find_pass_email',
+                        args=[
+                            email,
+                            code
+                        ])
+                    flash('Email send success', 'info')
+
+    return render_template('auth/find_password.j2')
+
+
 @bp.route('/register/activate')
 def register_activate():
     code = request.args.get('code')
@@ -227,10 +330,6 @@ def register_activate():
         'SELECT * FROM user_email_verify WHERE code=?',
         (code,)
     ).fetchone()
-
-    print(code)
-
-    print(row)
 
     if row is None:
         return render_template(

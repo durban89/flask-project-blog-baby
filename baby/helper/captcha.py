@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-14 14:14:21
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-14 16:41:49
+# @Last Modified time: 2019-11-22 17:56:11
 import random
 from flask import session
 from six import u
@@ -138,7 +138,7 @@ class Captcha(object):
         captcha_val = session['captcha_key'] if \
             'captcha_key' in session else ''
 
-        if captcha_val != text:
+        if captcha_val != text.lower():
             return False
         else:
             session.pop('captcha_key', None)

@@ -23,6 +23,17 @@
     </div>
 
     <div class="form-group">
+      <label for="category-id" class="label-category">Category</label>
+      <select class='form-control select-category' id="category_id" name="category_id" autocomplete="off" required>
+        {% for c in category %}
+        <option value='{{c.id}}' {% if c.id==request.form['category-id'] or c.id==post['category-id']%}
+          selected='selected'
+        {% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
       <label for="body" class="label-body">Body</label>
       <textarea name="body" id="body" class="textarea-body">{{ request.form['body'] or post['body'] }}</textarea>
     </div>

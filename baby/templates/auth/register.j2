@@ -16,6 +16,36 @@
     <input type="password" class="form-control input-password" name="password"" id="password" required/>
   </div>
 
+  <div class="form-group">
+    <label for="email" class="label-email">Email</label>
+    <input type="email" class="form-control input-email" name="email"" id="email" required/>
+  </div>
+
+  <div class=form-group>
+    <label for="verification-code" class="label-verification-code">Verification code</label>
+    <div class='input-group'>
+      <input type="text" class="form-control input-verification-code" id="verification-code" name="verification-code" required />
+      <div class="input-group-append">
+        <span id='captcha'>
+          <img src='{{url_for('home.captcha')}}' alt='verification code' style='height:calc(1.5em + .75rem + 2px)'/>
+        </span>
+      </div>
+    </div>
+  </div>
+  
   <button type="submit" class="btn btn-primary button-submit">Register</button>
 </form>
+{% endblock %}
+
+{% block script %}
+<script>
+$(function(){
+  $('#captcha').bind('click', function(){
+    var img = $(this).find('img');
+    var src = img.attr('src');
+    src = src.split('?')[0]+'?t='+new Date().valueOf();
+    img.attr('src', src);
+  })  
+})
+</script>
 {% endblock %}

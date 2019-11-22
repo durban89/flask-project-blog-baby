@@ -3,6 +3,7 @@
 import pytest
 from baby.db import get_db
 
+
 def test_index(client, auth):
     response = client.get('/')
     assert b'Log In' in response.data
@@ -17,6 +18,7 @@ def test_index(client, auth):
     assert b'test\nbody' in response.data
     assert b'href="/1/update"' in response.data
 
+
 @pytest.mark.parametrize('path', (
     '/create',
     '/1/update',
@@ -24,7 +26,8 @@ def test_index(client, auth):
 ))
 def test_login_required(client, path):
     response = client.post(path)
-    assert 'http://localhost/auth/login'  == response.headers['Location']
+    assert 'http://localhost/auth/login' == response.headers['Location']
+
 
 def test_author_required(app, client, auth):
     with app.app_context():
@@ -41,6 +44,7 @@ def test_author_required(app, client, auth):
 
     assert b'href="/1/update"' not in client.get('/').data
 
+
 @pytest.mark.parametrize('path', (
     ('/2/update'),
     ('/2/delete')
@@ -54,22 +58,24 @@ def test_create(client, auth, app):
     auth.login()
     assert client.get('/create').status_code == 200
 
-    client.post('/create', data={'title':'created','body':''})
+    client.post('/create', data={'title': 'created', 'body': ''})
 
     with app.app_context():
         db = get_db()
         count = db.execute('SELECT COUNT(id) FROM post').fetchone()[0]
         assert count == 2
 
+
 def test_update(app, client, auth):
     auth.login()
     assert client.get('/1/update').status_code == 200
-    client.post('/1/update', data={'title':'updated', 'body': ''})
+    client.post('/1/update', data={'title': 'updated', 'body': ''})
 
     with app.app_context():
         db = get_db()
         post = db.execute('SELECT * FROM post WHERE id = 1').fetchone()
         assert post['title'] == 'updated'
+
 
 @pytest.mark.parametrize('path', (
     '/create',
@@ -79,6 +85,7 @@ def test_create_update_validate(client, auth, path):
     auth.login()
     response = client.post(path, data={'title': '', 'body': ''})
     assert b'Title is required' in response.data
+
 
 def test_delete(app, client, auth):
     auth.login()

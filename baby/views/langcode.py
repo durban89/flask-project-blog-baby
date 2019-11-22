@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-11 12:00:49
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-13 10:43:17
+# @Last Modified time: 2019-11-21 14:54:02
 
 from flask import (
     Blueprint,
@@ -17,6 +17,7 @@ from baby.extensions import cache
 from baby.decorator import templated, cached
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 from baby.model import Movie, Imdb
+
 bp = Blueprint('langcode', __name__, url_prefix='/<lang_code>/langcode')
 
 
@@ -98,7 +99,6 @@ def create_me():
 
 
 def me():
-
     movies = Movie.objects(title='Back To The Feature')
 
     return render_template('langcode/me.j2', movies=movies)

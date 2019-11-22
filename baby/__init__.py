@@ -8,7 +8,7 @@ from flask import (
 )
 
 from logging.config import dictConfig
-from baby.extensions import socketio
+from baby.extensions import socketio, mail
 from baby import command
 from baby import views
 from baby import db
@@ -53,13 +53,23 @@ def create_app(test_config=None):
         'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'
     }
     app.config['UPLOAD_MAX_LENGTH'] = 1 * 1024 * 1024  # 1M
+
+    # mongodb config
     app.config['MONGODB_SETTINGS'] = {
         'db': 'baby',
         'alias': 'default'
     }
 
+    # celery config
     app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
     app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+
+    # flask-mail config
+    if 'MAIL_HOST' in app.config:
+        app.config['MAIL_SERVER'] = app.config['MAIL_HOST']
+
+    if 'MAIL_FROM' in app.config:
+        app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_FROM']
 
     try:
         os.makedirs(app.config['UPLOAD_DIR'])
@@ -98,6 +108,7 @@ def create_app(test_config=None):
     command.init_app(app)
     views.init_app(app)
     db.init_app(app)
+    mail.init_app(app)
 
     if not app.debug:
         register_mail(app)
@@ -113,18 +124,20 @@ def create_app(test_config=None):
 
     @app.errorhandler(BadRequest)
     def handle_bad_request(e):
+        app.logger.error(e)
         return 'bad request!', 400
 
     # 自定义制定状态码的处理逻辑
     @app.errorhandler(404)
     def handle_bad_404_request(e):
+        app.logger.error(e)
         return '404 bad request!', 400
 
     # 注册自定义异常
     @app.errorhandler(InvalidUsage)
     def handle_invalid_usage(e):
+        app.logger.error(e)
         response = jsonify(e.to_dict())
-        print(response)
         return response
 
     return app

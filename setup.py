@@ -2,13 +2,13 @@
 # @Author: durban.zhang
 # @Date:   2019-10-21 13:35:26
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-26 15:43:17
+# @Last Modified time: 2019-11-26 15:46:39
 
 from setuptools import find_packages, setup
 
 setup(
     name='baby',
-    version='1.0.9',
+    version='1.0.10',
     author='张大鹏',
     author_email='durban.zhang@gmail.com',
     packages=find_packages(),
@@ -22,7 +22,7 @@ setup(
         'Flask-Mail==0.9.1',
         'Pillow==6.2.1',
         'flask-mongoengine==0.9.5',
-        'gunicorn[eventlet]==19.9.0',
+        'gunicorn[eventlet]==20.0.3',
         'raven[flask]',
         'celery==4.3.0',
         'redis==3.3.11'

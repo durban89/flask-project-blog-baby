@@ -197,7 +197,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            logging.info('%s logged successfully', username)
+            current_app.logger.info('%s logged successfully', username)
 
             celery = create_celery(current_app)
             celery.send_task(

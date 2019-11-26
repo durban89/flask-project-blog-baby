@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-13 16:30:07
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-22 17:29:42
+# @Last Modified time: 2019-11-26 17:43:14
 from flask_mail import Message
 from baby.extensions import mail
 from baby import create_app
@@ -22,6 +22,7 @@ def send_login_email(user, email):
     message = 'Login Success'
     html = '<p>Login Success</p>'
     msg = Message(
+        sender='Walkerfree <407534636@qq.com>',
         subject=subject,
         body=message,
         html=html,

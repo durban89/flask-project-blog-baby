@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-13 16:30:07
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-22 17:29:42
+# @Last Modified time: 2019-11-28 10:41:14
 from flask_mail import Message
 from baby.extensions import mail
 from baby import create_app
@@ -16,15 +16,14 @@ def add_together(a, b):
 
 
 @celery.task(name="tasks.send_login_email")
-def send_login_email(user, email):
+def send_login_email(domain, user, email):
 
     subject = 'Hello, %s' % user
-    message = 'Login Success'
-    html = '<p>Login Success</p>'
+    html = '<p>Login <a target="_blank" href="%s">%s</a> Success</p>'
     msg = Message(
+        sender='Walkerfree <407534636@qq.com>',
         subject=subject,
-        body=message,
-        html=html,
+        html=html % (domain, domain),
         recipients=[email]
     )
 
@@ -32,7 +31,7 @@ def send_login_email(user, email):
 
 
 @celery.task(name='tasks.find_pass_email')
-def find_pass_email(email, code):
+def find_pass_email(domain, email, code):
     subject = 'Please verify your email address'
     html = '''
 <html>
@@ -69,9 +68,11 @@ Or copy this link <b>%s</b> to reset your password.
 </body>
 </html>
 '''
-    link = 'https://www.walkerfree.com/auth/find/password/activate?code=%s'
+    link = '%s/auth/find/password/activate?code=%s'
     link = link % (
-        code)
+        domain,
+        code
+    )
 
     with mail.connect() as conn:
 
@@ -86,7 +87,7 @@ Or copy this link <b>%s</b> to reset your password.
 
 
 @celery.task(name='tasks.send_register_email')
-def send_register_email(username, email, code):
+def send_register_email(domain, username, email, code):
     subject = 'Please verify your email address'
     html = '''
 <html>
@@ -123,7 +124,7 @@ Or copy this link <b>%s</b> to verify your email.
 </body>
 </html>
 '''
-    link = 'https://www.walkerfree.com/auth/register/activate?code=%s' % (code)
+    link = '%s/auth/register/activate?code=%s' % (domain, code)
 
     with mail.connect() as conn:
 

@@ -27,6 +27,13 @@ from baby.celery import create_celery
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
+def get_http_domain():
+    url_scheme = request.environ.get('wsgi.url_scheme')
+    host = request.environ.get('HTTP_HOST')
+
+    return '%s://%s' % (url_scheme, host)
+
+
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -83,7 +90,7 @@ def register():
             )
             db.commit()
 
-            send_register_email(username, email)
+            send_register_email(get_http_domain(), username, email)
 
             return render_template(
                 'auth/register_success.j2',
@@ -202,8 +209,13 @@ def login():
             celery = create_celery(current_app)
             celery.send_task(
                 name='tasks.send_login_email',
-                args=[user['username'], 'zhangdapeng89@126.com']
+                args=[
+                    get_http_domain(),
+                    user['username'],
+                    user['email']
+                ]
             )
+            current_app.logger.info('%s logged successfully other ', username)
 
             return redirect(url_for('blog.index'))
 
@@ -313,6 +325,7 @@ def find_password():
                     celery.send_task(
                         name='tasks.find_pass_email',
                         args=[
+                            get_http_domain(),
                             email,
                             code
                         ])
@@ -358,7 +371,7 @@ def register_activate():
         return redirect(url_for('auth.login'))
 
 
-def send_register_email(username, email):
+def send_register_email(domain, username, email):
     db = get_db()
     code = urlsafe_b64encode(urandom(64)).decode('utf-8')
 
@@ -377,6 +390,7 @@ def send_register_email(username, email):
     celery = create_celery(current_app)
     celery.send_task(name='tasks.send_register_email',
                      args=[
+                         domain,
                          username,
                          email,
                          code

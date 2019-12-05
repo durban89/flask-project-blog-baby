@@ -1,6 +1,5 @@
 #! _*_ coding: utf-8 _*_
 import functools
-import logging
 import time
 import re
 from os import urandom
@@ -132,7 +131,7 @@ def check_password_safe(password):
 
     # searching for symbols
     symbol_error = re.search(
-        r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]', password) is None
+        r"[ !#$%&'()*+,;-./[\\\]^_`{|}~" + r'"]', password) is None
 
     ok = not (
         length_error or
@@ -244,25 +243,35 @@ def find_password_activate():
             (code,)
         ).fetchone()
 
-        if row is None:
-            flash('验证失败')
-        else:
-            row = dict(row)
-            ctime = int(time.time())
-            if ctime > row['expired']:
-                flash('链接已过期，请重新提交')
-            else:
-                db.execute(
-                    'UPDATE user SET password=? WHERE email = ?',
-                    (generate_password_hash(password), row['email'])
-                )
-                db.execute(
-                    'UPDATE find_password_verify SET expired = 0 WHERE id = ?',
-                    (row['id'],)
-                )
-                db.commit()
+        error = None
+        if not password:
+            error = 'Password is required.'
+        elif password and not check_password_safe(password):
+            error = 'Password is not safety.'
 
-                flash('密码设置成功', 'success')
+        if error is None:
+            if row is None:
+                flash('验证失败')
+            else:
+                row = dict(row)
+                ctime = int(time.time())
+                if ctime > row['expired']:
+                    flash('链接已过期，请重新提交')
+                else:
+                    db.execute(
+                        'UPDATE user SET password=? WHERE email = ?',
+                        (generate_password_hash(password), row['email'])
+                    )
+                    db.execute(
+                        'UPDATE find_password_verify'
+                        ' SET expired = 0 WHERE id = ?',
+                        (row['id'],)
+                    )
+                    db.commit()
+
+                    flash('密码设置成功', 'success')
+        else:
+            flash(error, 'warning')
 
     return render_template('auth/find_password_activate.j2')
 

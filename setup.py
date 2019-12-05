@@ -2,13 +2,13 @@
 # @Author: durban.zhang
 # @Date:   2019-10-21 13:35:26
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-12-05 15:55:32
+# @Last Modified time: 2019-12-05 16:58:24
 
 from setuptools import find_packages, setup
 
 setup(
     name='baby',
-    version='1.0.15',
+    version='1.0.16',
     author='张大鹏',
     author_email='durban.zhang@gmail.com',
     packages=find_packages(),

@@ -8,7 +8,6 @@ from flask import (
     Blueprint,
     jsonify,
     request,
-    current_app,
     render_template,
     g,
     flash,
@@ -182,7 +181,7 @@ def delete(id):
     db.execute('DELETE FROM food_list WHERE autokid = :id', {'id': id})
     db.commit()
 
-    return success_json()
+    return jsonify()
 
 
 @bp.route('/<int:id>', methods=['GET', 'POST'])
@@ -249,7 +248,7 @@ def week_update(week, type_id):
             content = request.form['content']
 
             db = get_db()
-            timestamp = mtime = int(time.time())
+            timestamp = int(time.time())
 
             if week_data is None:
                 db.execute(

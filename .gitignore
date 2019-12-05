@@ -14,3 +14,4 @@ instance/
 gunicorn.conf
 .env*
 uploads
+.github

@@ -2,7 +2,7 @@
 # @Author: durban
 # @Date:   2019-11-07 21:55:23
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-12-04 18:53:52
+# @Last Modified time: 2019-12-05 16:37:34
 
 import getpass
 from fabric import Connection, task
@@ -15,11 +15,11 @@ def pack(c):
 
 @task
 def deploy(c):
-    user = raw_input('Input login user name: ')
+    user = input('Input login user name: ')
 
-    host = raw_input('Input login host: ')
+    host = input('Input login host: ')
 
-    root = raw_input('Input project root path：')
+    root = input('Input project root path：')
 
     user_pass = getpass.getpass('Input login user pass：')
 
@@ -32,10 +32,14 @@ def deploy(c):
 
     remote = Connection('%s@%s' % (user, host),
                         connect_kwargs={"password": user_pass})
+
+    remote.run('cd %s && ls -al' % root)
+    return False
+
     remote.put('./dist/%s' %
                filename, remote='%s' % root)
 
-    result = remote.run('cd %s &&\
+    remote.run('cd %s &&\
      source .env/bin/activate &&\
         ls -al && type python &&\
          pip install %s &&\

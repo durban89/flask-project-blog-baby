@@ -1,41 +1,35 @@
-#! _*_ coding: utf-8 _*_
-#
-#
+# -*- coding: utf-8 -*-
+# @Author: durban.zhang
+# @Date:   2019-12-05 18:30:44
+# @Last Modified by:   durban.zhang
+# @Last Modified time: 2019-12-05 18:46:49
 
-import click
-import os
-import tempfile
-import hashlib
-import flask
-import pytest
-from baby import create_app
-from baby.db import init_db, get_db
 from flask import session
 from werkzeug.security import check_password_hash
 
-with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
-    _data_sql = f.read().decode('utf8')
+# with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
+#     _data_sql = f.read().decode('utf8')
 
 
-@pytest.fixture
-def client():
-    db_fd, db_path = tempfile.mkstemp()
+# @pytest.fixture
+# def client():
+#     db_fd, db_path = tempfile.mkstemp()
 
-    app = create_app({
-        'DATABASE': db_path,
-        'TESTING': True
-    })
+#     app = create_app({
+#         'DATABASE': db_path,
+#         'TESTING': True
+#     })
 
-    client = app.test_client()
+#     client = app.test_client()
 
-    with app.app_context():
-        init_db()
-        get_db().executescript(_data_sql)
+#     with app.app_context():
+#         init_db()
+#         get_db().executescript(_data_sql)
 
-    yield client
+#     yield client
 
-    os.close(db_fd)
-    os.unlink(app.config['DATABASE'])
+#     os.close(db_fd)
+#     os.unlink(app.config['DATABASE'])
 
 
 def test_empty_db(client):
@@ -43,24 +37,24 @@ def test_empty_db(client):
     assert b'Baby' in rv.data
 
 
-class AuthActions(object):
+# class AuthActions(object):
 
-    def __init__(self, client):
-        self._client = client
+#     def __init__(self, client):
+#         self._client = client
 
-    def login(self, username='test', password='test'):
-        return self._client.post(
-            '/auth/login',
-            data={'username': username, 'password': password},
-            follow_redirects=True
-        )
+#     def login(self, username='test', password='test'):
+#         return self._client.post(
+#             '/auth/login',
+#             data={'username': username, 'password': password},
+#             follow_redirects=True
+#         )
 
-    def logout(self):
-        return self._client.get('/auth/logout', follow_redirects=True)
+#     def logout(self):
+#         return self._client.get('/auth/logout', follow_redirects=True)
 
 
 def test_login(client, auth):
-    auth.login('test', 'test')
+    auth.login()
     with client:
         client.get('/')
         assert session['user_id'] == 1
@@ -77,21 +71,26 @@ def test_login(client, auth):
 def test_logout(client, auth):
     auth.login('test', 'test')
     with client:
-        rv = auth.logout()
+        auth.logout()
         assert 'user_id' not in session
 
 
 def test_add_post(client, auth):
     auth.login()
+
     with client:
-        rv = client.post('/create', data=dict(
+        rv = client.post('/post/create', data=dict(
             title='<Hello>',
-            body='<strong>Html</strong> is here'
+            body='<strong>Html</strong> is here',
+            tag='html',
+            date='2019-12-05',
+            category_id=1
         ), follow_redirects=True)
 
-        assert b'&lt;strong&gt;Html&lt;/strong&gt; is here' in rv.data
+        print(rv.data)
+        assert b'<strong>Html</strong> is here' in rv.data
 
-        assert b'&lt;Hello&gt;' in rv.data
+        assert b'<Hello>' in rv.data
 
 
 def test_api_auth(app):

@@ -2,14 +2,14 @@
 # @Author: durban.zhang
 # @Date:   2019-11-13 17:19:11
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-12-06 10:57:10
+# @Last Modified time: 2019-12-06 11:10:39
 from celery import Celery
 
 
 def create_celery(app=None):
     if 'CELERY_RESULT_BACKEND' not in app.config \
-            and 'CELERY_BROKER_URL' not in app.config:
-        raise Exception('Celery config is wrong')
+            or 'CELERY_BROKER_URL' not in app.config:
+        return False
 
     celery = Celery(
         app.import_name,

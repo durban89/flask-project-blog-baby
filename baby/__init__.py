@@ -57,16 +57,6 @@ def create_app(test_config=None):
     }
     app.config['UPLOAD_MAX_LENGTH'] = 1 * 1024 * 1024  # 1M
 
-    # mongodb config
-    app.config['MONGODB_SETTINGS'] = {
-        'db': 'baby',
-        'alias': 'default'
-    }
-
-    # celery config
-    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
-    app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
-
     # flask-mail config
     if 'MAIL_HOST' in app.config:
         app.config['MAIL_SERVER'] = app.config['MAIL_HOST']

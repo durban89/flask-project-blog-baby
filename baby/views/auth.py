@@ -210,18 +210,17 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            current_app.logger.info('%s logged successfully', username)
 
             celery = create_celery(current_app)
-            celery.send_task(
-                name='tasks.send_login_email',
-                args=[
-                    get_http_domain(),
-                    user['username'],
-                    user['email']
-                ]
-            )
-            current_app.logger.info('%s logged successfully other ', username)
+            if celery:
+                celery.send_task(
+                    name='tasks.send_login_email',
+                    args=[
+                        get_http_domain(),
+                        user['username'],
+                        user['email']
+                    ]
+                )
 
             return redirect(url_for('blog.index'))
 

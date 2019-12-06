@@ -14,4 +14,4 @@ instance/
 gunicorn.conf
 .env*
 uploads
-.github
+.github/workflows/pythonpackage.yml

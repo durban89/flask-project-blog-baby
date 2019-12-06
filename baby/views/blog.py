@@ -2,7 +2,7 @@
 # @Author: durban.zhang
 # @Date:   2019-11-11 11:25:10
 # @Last Modified by:   durban.zhang
-# @Last Modified time: 2019-11-26 18:02:12
+# @Last Modified time: 2019-12-06 09:15:41
 
 import os
 from flask import (
@@ -90,24 +90,21 @@ def index():
 @login_required
 def create():
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
-        date = request.form['date']
-        tag = request.form['tag']
+        title = request.form['title'] if 'title' in request.form else ''
+        body = request.form['body'] if 'body' in request.form else ''
+        date = request.form['date'] if 'date' in request.form else ''
+        tag = request.form['tag'] if 'tag' in request.form else ''
         category_id = request.form[
             'category_id'] if 'category_id' in request.form else ''
+
         error = None
 
         if not title:
             error = 'Title is required'
-
-        if not category_id:
+        elif not category_id:
             error = 'Category is required'
-
-        if not tag:
+        elif not tag:
             error = 'Tag is required'
-
-        tags = tag.split(',')
 
         if error is not None:
             flash(error)
@@ -124,6 +121,7 @@ def create():
 
             # tag insert
             insert_id = cur.lastrowid
+            tags = tag.split(',')
 
             cur.executemany(
                 'INSERT INTO tag (post_id, name)'
@@ -199,23 +197,20 @@ def update(id):
     post = get_post(id)
 
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
-        date = request.form['date']
-        tag = request.form['tag']
-        category_id = request.form['category_id']
+        title = request.form['title'] if 'title' in request.form else ''
+        body = request.form['body'] if 'body' in request.form else ''
+        date = request.form['date'] if 'date' in request.form else ''
+        tag = request.form['tag'] if 'tag' in request.form else ''
+        category_id = request.form[
+            'category_id'] if 'category_id' in request.form else ''
         error = None
 
         if not title:
             error = 'Title is required'
-
-        if not category_id:
+        elif not category_id:
             error = 'Category is request'
-
-        if not tag:
+        elif not tag:
             error = 'Tag is required'
-
-        tags = tag.split(',')
 
         if error is not None:
             flash(error)
@@ -238,6 +233,7 @@ def update(id):
                 'DELETE FROM tag WHERE post_id = ?', (id,)
             )
 
+            tags = tag.split(',')
             cur.executemany(
                 'INSERT INTO tag (post_id, name)'
                 ' VALUES (?,?)', tag_generator(id, tags)

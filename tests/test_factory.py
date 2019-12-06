@@ -9,5 +9,6 @@ def test_config():
 
 
 def test_baby(client):
-    response = client.get('/baby')
-    assert response.data == b'Baby'
+    response = client.get('/')
+    print(response.data)
+    assert b'Baby' in response.data

@@ -48,10 +48,14 @@ def load_logged_in_user():
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        code = request.form['verification-code']
+        username = request.form[
+            'username'] if 'username' in request.form else ''
+        password = request.form[
+            'password'] if 'password' in request.form else ''
+        email = request.form['email'] if 'email' in request.form else ''
+        code = request.form[
+            'verification-code'] if 'verification-code' in request.form else ''
+
         db = get_db()
         error = None
 
@@ -173,9 +177,12 @@ def registered_email(email):
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        code = request.form['verification-code']
+        username = request.form[
+            'username'] if 'username' in request.form else ''
+        password = request.form[
+            'password'] if 'password' in request.form else ''
+        code = request.form[
+            'verification-code'] if 'verification-code' in request.form else ''
 
         db = get_db()
         error = None

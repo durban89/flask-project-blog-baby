@@ -44,10 +44,14 @@ class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, username='test', password='test'):
+    def login(self, username='test', password='test', code='1111'):
+        with self._client.session_transaction() as session:
+            session['captcha_key'] = '1111'
+
         return self._client.post(
             '/auth/login',
-            data={'username': username, 'password': password}
+            data={'username': username, 'password': password,
+                  'verification-code': code}
         )
 
     def logout(self):

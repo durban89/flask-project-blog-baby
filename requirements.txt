@@ -7,7 +7,7 @@ blinker==1.4
 celery==4.3.0
 cffi==1.13.2
 Click==7.0
-cryptography==2.8
+cryptography==3.2
 dnspython==1.16.0
 eventlet==0.25.1
 fabric==2.5.0

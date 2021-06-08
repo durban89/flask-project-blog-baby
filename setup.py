@@ -20,7 +20,7 @@ setup(
         'Flask-Caching==1.7.2',
         'Flask-WTF==0.14.2',
         'Flask-Mail==0.9.1',
-        'Pillow==6.2.1',
+        'Pillow==8.2.0',
         'flask-mongoengine==0.9.5',
         'gunicorn[eventlet]==20.0.3',
         'raven[flask]',

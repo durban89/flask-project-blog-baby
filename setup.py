@@ -24,7 +24,7 @@ setup(
         'flask-mongoengine==0.9.5',
         'gunicorn[eventlet]==20.0.3',
         'raven[flask]',
-        'celery==4.3.0',
+        'celery==5.2.2',
         'redis==3.3.11'
     ]
 )
